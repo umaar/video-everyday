@@ -1,0 +1,4 @@
+{
+  "ignore": ["src/client/*", "dist/*"],
+  "ext": "html js css"
+}
