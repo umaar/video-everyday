@@ -23,6 +23,18 @@
     {% block content %}
     {% endblock %}
     {% include "./partials/footer.html" %}
+    <script>
+      window.everyDayVideoConfig = {
+        thumbnailsAmount: {{config.thumbnailsAmount}}
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.0.1/nunjucks-slim.min.js" integrity="sha256-tdB3uMy+X5YRM5JMGgy1oMtdSm1GwTEMmWb7q80e2+g=" crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/popper.js@1"></script>
+    <script src="https://unpkg.com/tippy.js@5"></script>
+
+    <script src="{{rev('js/templates.js')}}"></script>
+    <script async src="{{rev('js/main.js')}}"></script>
     {% block js %}{% endblock %}
   </body>
 </html>
