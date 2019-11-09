@@ -1,0 +1,41 @@
+<section>
+	
+	<article>
+		<button class="consolidate-media">
+			Consolidate Media
+		</button>
+	</article>
+
+	<ul class="media-grid">
+		{% for dateBucket, mediaItems in dateBuckets %}
+			<li class="media-grid__list-item">
+
+				{% set mediaItem = mediaItems[0] %}
+				{% include './media-grid-primary-item.html' %}
+
+				<ol class="media-grid__alternatives">
+					{% for index in range(0, mediaItems.length) %}
+						{% set mediaItem = mediaItems[index] %}
+
+						<li class="media-grid__alternatives-list-item {{ "media-grid__alternatives-list-item--active" if loop.first }}">
+							<p
+								data-is-video="{{mediaItem.isVideo}}"
+								data-formatted-date="{{mediaItem.formattedDate}}"
+								data-url="{{mediaItem.url}}"
+								data-name="{{mediaItem.filename}}"
+								data-mini-video-segment="{{mediaItem.miniVideoSegment}}"
+							>
+								{% if mediaItem.isVideo %}
+									🎥️ &nbsp;{{mediaItem.videoDuration}}
+								{% else %}
+									🖼️
+								{% endif %}
+								{{mediaItem.filename}}
+							</p>
+						</li>
+					{% endfor %}
+				</ol>
+			</li>
+		{% endfor %}
+	</ul>
+</section>
