@@ -18,7 +18,7 @@
     "compression": "^1.7.4",
     "config": "^3.2.4",
     "connect-flash": "^0.1.1",
-    "connect-session-knex": "^1.4.0",
+    "connect-session-knex": "^1.5.0",
     "cookie-parser": "~1.4.4",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
@@ -29,7 +29,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "forcedomain": "^2.0.0",
     "gulp-concat": "^2.6.1",
-    "knex": "^0.20.1",
+    "knex": "^0.20.2",
     "mkdirp": "^0.5.1",
     "nunjucks": "^3.2.0",
     "passport": "^0.4.0",
@@ -52,13 +52,13 @@
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "rollup": "^1.26.3",
+    "rollup": "^1.27.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-uglify": "^6.0.3",
     "tiny-lr": "^1.1.1",
-    "vinyl-paths": "^3.0.0",
+    "vinyl-paths": "^3.0.1",
     "xo": "^0.25.3"
   }
 }
