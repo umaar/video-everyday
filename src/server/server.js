@@ -15,7 +15,7 @@
 	try {
 		await prepareMedia();
 	} catch (err) {
-		console.log('Nooo there was an error, ', err);
+		console.log('\nError preparing media, ', err);
 		throw Error(err)
 	}
 	const port = normalizePort(config.get('port'));

@@ -173,7 +173,6 @@ gulp.task('lr', done => {
 });
 
 gulp.task('nodemon', done => {
-	console.log('NODE MON TASK');
 	return nodemon({
 		...nodemonConfig,
 		done

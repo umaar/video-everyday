@@ -7,8 +7,6 @@ const path = require("path");
 const config = require('config');
 const mkdirp = require("mkdirp");
 
-
-
 const videoSegmentFolder = config.get('video-segment-folder');
 const defaultVideoSegmentDuration = config.get('video-segment-duration-seconds');
 const mediaFolder = config.get('media-folder')
@@ -22,15 +20,12 @@ async function init({mediaFile, totalVideoDuration}) {
 	mkdirp.sync(videoSegmentFolderForMedia);
 	let newFileName;
 
-	console.log({defaultVideoSegmentDuration, totalVideoDuration});
-
 	// 5 is a minimum padding, in seconds which the video should have for MP4Box to do a split
 	if ((defaultVideoSegmentDuration + 7) < totalVideoDuration) {
 		const MP4BoxBinary = `/Applications/GPAC.app/Contents/MacOS/MP4Box`;
 		const halfWayMark = Math.floor(totalVideoDuration / 2);
 		const command = `(cd '${videoSegmentFolderForMedia}' && ${MP4BoxBinary} -splitx ${halfWayMark}:${halfWayMark + defaultVideoSegmentDuration} '${absoluteFilePathForMedia}')`
 
-		console.log({command});
 		const {stderr} = await exec(command)
 
 		const indexOfFileName = stderr.indexOf( parsedMediaFileName.name );
@@ -38,8 +33,7 @@ async function init({mediaFile, totalVideoDuration}) {
 
 		newFileName = stderr.substring(indexOfFileName, indexOfFileExtension + parsedMediaFileName.ext.length)
 	} else {
-		console.log(`This file is too small for segmenting ${mediaFile} with MP4Box`);
-
+		console.log(`This file is too small for segmenting ${mediaFile} with MP4Box. Will use the whole video file instead.`);
 
 		const command = `cp '${absoluteFilePathForMedia}' '${videoSegmentFolderForMedia}'`;
 		newFileName = `${parsedMediaFileName.name}${parsedMediaFileName.ext}`
@@ -54,11 +48,14 @@ async function init({mediaFile, totalVideoDuration}) {
 
 	const newCommand = `ffmpeg -y -i '${videoSegmentAbsolutePath}' -vf "scale=640:-2" '${videoSegmentAbsolutePath}.mini${ext}'`
 
-	console.log('\n\n', newCommand, '\n\n');
+	console.log('Mini video command: ', newCommand);
 
 	const {stderr: ffmpegStderr} = await exec(newCommand)
 
-	return newFileRelativePath;
+	return {
+		relativeVideoSegmentPath: newFileRelativePath,
+		segmentDuration: defaultVideoSegmentDuration
+	};
 }
 
 module.exports = init;

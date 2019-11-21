@@ -19,6 +19,11 @@ router.post('/consolidate-media', async (req, res) => {
 	const videoSegmentFolder = config.get('video-segment-folder');
 	const consolidatedMediaFolder = config.get('consolidated-media-folder');
 
+	// Naive check that this folder value is legit!
+	if (!consolidatedMediaFolder || consolidatedMediaFolder.length < 10) {
+		throw new Error(`The consolidated-media-folder (${consolidatedMediaFolder}) appears to be invalid`)
+	}
+
 	const selectedMediaItemsRaw = req.body;
 	const allMedia = (await mediaMetadataQueries.getAllMedia());
 
@@ -79,7 +84,6 @@ router.get('/', async (req, res) => {
 			const videoSegment = path.join(webServerMediaPath, 'segments', preferredVideoSegment);
 
 			miniVideoSegment = `${videoSegment}.mini${path.parse(item.relativeFilePath).ext}`
-			console.log(miniVideoSegment);
 		}
 
 		return {

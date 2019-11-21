@@ -98,19 +98,20 @@ async function init() {
 		if (isVideo) {
 			DBRecord.videoDuration = metadata.duration
 
-			const relativeVideoSegmentPath = await generateVideoSegment({
+			const {segmentDuration, relativeVideoSegmentPath} = await generateVideoSegment({
 				mediaFile,
 				totalVideoDuration: DBRecord.videoDuration
 			});
 
 			console.log(`New Video Segment: ${relativeVideoSegmentPath}`);
 			DBRecord.defaultVideoSegment = relativeVideoSegmentPath;
+			DBRecord.defaultVideoSegmentDuration = segmentDuration;
 		}
 
 		await mediaMetadataQueries.insert(DBRecord);
 	}
 
-	console.log(`${unprocessableMediaCount} items couldn't be processed`);
+	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
 
 	await generateThumbnails();
 }

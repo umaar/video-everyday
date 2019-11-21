@@ -6,6 +6,7 @@ exports.up = function(knex, Promise) {
 		table.string('mediaSource').notNullable();
 		table.integer('videoDuration');
 		table.string('defaultVideoSegment');
+		table.integer('defaultVideoSegmentDuration');
 		table.string('userSelectedVideoSegment');
 	});
 };

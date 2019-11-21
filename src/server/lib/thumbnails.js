@@ -59,7 +59,7 @@ function generateThumbnails({
 	    takeScreenshots(absoluteFilePathForMedia)
 	})
 }
-	
+
 async function init() {
 	const existingThumbnails = await scanFiles(thumbnailsFolder);
 	const rawMediaInDB = await mediaMetadataQueries.getAllMedia();
@@ -93,6 +93,8 @@ async function init() {
 
 	if (videoThumbnailsWhichNeedGenerating.length) {
 		console.log(`${videoThumbnailsWhichNeedGenerating.length} videos needs thumbnail processing`);
+	} else {
+		console.log(`No video thumbails need generating`);
 	}
 
 	for (let {absoluteFilePathForMedia, thumbnailFolderForMedia} of videoThumbnailsWhichNeedGenerating) {
