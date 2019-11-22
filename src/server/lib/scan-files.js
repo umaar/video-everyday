@@ -1,8 +1,9 @@
-const fsp = require('fs').promises;
-const path = require('path');
+import path from 'path';
+import {promises as FSPromises} from 'fs';
+// const fsp = require('fs').promises;
 
 async function scan(directoryName, results = []) {
-	const files = await fsp.readdir(directoryName, {withFileTypes: true});
+	const files = await FSPromises.readdir(directoryName, {withFileTypes: true});
 	for (const f of files) {
 		const fullPath = path.join(directoryName, f.name);
 		if (f.isDirectory()) {
@@ -15,4 +16,4 @@ async function scan(directoryName, results = []) {
 	return results;
 }
 
-module.exports = scan;
+export default scan;

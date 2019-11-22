@@ -1,7 +1,7 @@
-(function (routeConfig) {
-	routeConfig.init = function (app) {
-		const routes = require('../routes');
+import routes from '../routes/index.js';
 
-		app.use('/', routes);
-	};
-})(module.exports);
+function init (app) {
+	app.use('/', routes);
+};
+
+export default init;

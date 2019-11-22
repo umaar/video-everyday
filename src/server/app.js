@@ -1,11 +1,11 @@
-const {app, express} = require('./app-instance');
+import {app, express} from './app-instance.js';
 
-const appConfig = require('./config/main-config.js');
-const routeConfig = require('./config/route-config.js');
-const errorConfig = require('./config/error-config.js');
+import appConfig from './config/main-config.js';
+import routeConfig from './config/route-config.js';
+import errorConfig from './config/error-config.js';
 
-appConfig.init(app, express);
-routeConfig.init(app);
-errorConfig.init(app);
+appConfig(app, express);
+routeConfig(app);
+errorConfig(app);
 
-module.exports = app;
+export default app;

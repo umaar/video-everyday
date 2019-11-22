@@ -1,4 +1,4 @@
-const {Signale} = require('signale');
+import SignaleModule from 'signale';
 
 const options = {
 	types: {
@@ -9,7 +9,7 @@ const options = {
 	}
 };
 
-const custom = new Signale(options);
+const custom = new SignaleModule.Signale(options);
 
 custom.config({
 	displayFilename: true,
@@ -17,4 +17,6 @@ custom.config({
 	displayDate: true
 });
 
-module.exports = custom;
+// module.exports = custom;
+
+export default custom;

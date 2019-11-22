@@ -22,7 +22,7 @@ function getMediaType(mediaPath) {
 	}
 }
 
-module.exports = {
+export {
 	isValidMediaType,
 	getMediaType
-};
+}

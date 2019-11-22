@@ -1,16 +1,16 @@
 
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec)
+import { promisify } from 'util';
+import {exec as execOld} from 'child_process';
 
-const fs = require("fs");
-const path = require("path");
-const config = require('config');
-const mkdirp = require("mkdirp");
+import fs from "fs";
+import path from "path";
+import config from 'config';
+import mkdirp from "mkdirp";
 
+const exec = promisify(execOld);
 const videoSegmentFolder = config.get('video-segment-folder');
 const defaultVideoSegmentDuration = config.get('video-segment-duration-seconds');
 const mediaFolder = config.get('media-folder')
-
 
 async function init({mediaFile, totalVideoDuration}) {
 	const absoluteFilePathForMedia = path.join(mediaFolder, mediaFile);
@@ -58,4 +58,4 @@ async function init({mediaFile, totalVideoDuration}) {
 	};
 }
 
-module.exports = init;
+export default init;

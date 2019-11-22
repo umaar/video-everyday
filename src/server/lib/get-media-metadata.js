@@ -1,7 +1,8 @@
-const sharp = require('sharp');
-const exifReader = require('exif-reader');
-const ffmpeg = require('fluent-ffmpeg');
-const {getMediaType} = require('./is-valid-media-type');
+import sharp from 'sharp';
+import exifReader from 'exif-reader';
+import ffmpeg from 'fluent-ffmpeg';
+
+import {getMediaType} from './is-valid-media-type.js';
 
 async function getExif(fullPath) {
 	const metadata = {};
@@ -79,4 +80,4 @@ async function getMetadata(fullPath) {
 	}
 }
 
-module.exports = getMetadata;
+export default getMetadata;

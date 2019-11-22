@@ -1,16 +1,20 @@
-const databaseName = 'video-everyday';
+import path from 'path';
+const databaseName = 'video-everyday';;
 
-module.exports = {
+const migrationsDirectory = path.join(process.cwd(), '/src/server/db/migrations');
+const seedsDirectory = path.join(process.cwd(), '/src/server/db/seeds');
+
+const config = {
 	development: {
 		client: 'sqlite3',
 		connection: {
 			filename: `./db-development-${databaseName}.sqlite`
 		},
 		migrations: {
-			directory: __dirname + '/src/server/db/migrations'
+			directory: migrationsDirectory
 		},
 		seeds: {
-			directory: __dirname + '/src/server/db/seeds'
+			directory: seedsDirectory
 		},
 		useNullAsDefault: true
 	},
@@ -20,10 +24,12 @@ module.exports = {
 			filename: `./db-production-${databaseName}.sqlite`
 		},
 		migrations: {
-			directory: __dirname + '/src/server/db/migrations'
+			directory: migrationsDirectory
 		},
 		seeds: {
-			directory: __dirname + '/src/server/db/seeds'
+			directory: seedsDirectory
 		}
 	}
 };
+
+export default config;

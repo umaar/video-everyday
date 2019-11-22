@@ -1,14 +1,15 @@
 // const syncMediaToDatabase = require('./sync-media-to-database.js');
-const generateThumbnails = require('./thumbnails.js');
 // const generateVideosSegment = require('./generate-videos-segment.js');
-const path = require('path');
-const fs = require('fs');
-const config = require('config');
-const {isValidMediaType, getMediaType} = require('./is-valid-media-type');
-const getMediaMetadata = require('./get-media-metadata');
-const generateVideoSegment = require('./generate-video-segment');
-const scanFiles = require('./scan-files');
-const mediaMetadataQueries = require('../db/queries/media-metadata-queries');
+import path from 'path';
+import fs from 'fs';
+import config from 'config';
+
+import {isValidMediaType, getMediaType} from './is-valid-media-type.js';
+import generateThumbnails from './thumbnails.js';
+import getMediaMetadata from './get-media-metadata.js';
+import generateVideoSegment from './generate-video-segment.js';
+import scanFiles from './scan-files.js';
+import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 
 function hasBracketsInPath(fullPath) {
 	/*
@@ -116,4 +117,4 @@ async function init() {
 	await generateThumbnails();
 }
 
-module.exports = init;
+export default init;

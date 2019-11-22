@@ -1,13 +1,14 @@
 
-const fs = require("fs");
-const path = require("path");
-const config = require('config');
-const ffmpeg = require("fluent-ffmpeg");
-const rimraf = require("rimraf");
-const mkdirp = require("mkdirp");
-const mediaMetadataQueries = require('../db/queries/media-metadata-queries');
-const scanFiles = require('./scan-files');
-const {getMediaType} = require('./is-valid-media-type');
+import fs from "fs";
+import path from "path";
+import config from 'config';
+import ffmpeg from "fluent-ffmpeg";
+import rimraf from "rimraf";
+import mkdirp from "mkdirp";
+
+import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
+import scanFiles from './scan-files.js';
+import {getMediaType} from './is-valid-media-type.js';
 
 const thumbnailsDesiredAmount = config.get('thumbnails-amount');
 const startPositionPercent = 5;
@@ -113,4 +114,4 @@ async function init() {
 
 }
 
-module.exports = init;
+export default init;

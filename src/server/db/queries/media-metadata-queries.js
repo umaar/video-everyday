@@ -1,4 +1,4 @@
-const knex = require('../connection');
+import knex from '../connection.js';
 
 const mediaMetadataTableName = 'mediaMetadata';
 
@@ -16,8 +16,8 @@ async function deleteFileEntry(relativeFilePath) {
 		.del();
 }
 
-module.exports = {
+export default {
 	insert,
 	getAllMedia,
 	deleteFileEntry
-};
+}

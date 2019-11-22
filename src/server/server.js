@@ -1,16 +1,16 @@
-(async function () {
-	'use strict';
+import http from 'http';
+import debug from 'debug';
 
-	const logger = require('./logger');
+import logger from './logger.js';
+import config from 'config';
 
+import prepareMedia from './lib/prepare-media.js';
+
+import app from './app.js';
+
+async function init() {
 	logger.info('App Starting...');
-	const config = require('config');
-	const app = require('./app');
-
-	const prepareMedia = require('./lib/prepare-media.js');
-
-	const debug = require('debug')('herman-express:server');
-	const http = require('http');
+	debug('herman-express:server');
 
 	try {
 		await prepareMedia();
@@ -68,4 +68,6 @@
 		debug('Listening on ' + bind);
 		logger.info(`[URL]: ${config.get('domain')}`);
 	}
-})();
+}
+
+init();

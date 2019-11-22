@@ -1,19 +1,25 @@
-require('dotenv').config();
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec)
-const path = require('path');
-const express = require('express');
-const config = require('config');
-const rimraf = require("rimraf");
+// require('dotenv').config();
+import dotenv from 'dotenv';
+// const { promisify } = require('util');
+import { promisify } from 'util';
+import {exec as execOld} from 'child_process';
+// const exec = promisify(require('child_process').exec)
+import path from 'path';
+import express from 'express';
+import config from 'config';
+import rimraf from "rimraf";
 
-const {app} = require('../app-instance');
+import {app} from '../app-instance.js';
 
-const mediaMetadataQueries = require('../db/queries/media-metadata-queries');
-const {getMediaType} = require('../lib/is-valid-media-type');
+import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
+import {getMediaType} from '../lib/is-valid-media-type.js';
 
+dotenv.config()
+const exec = promisify(execOld)
 const router = express.Router();
 
 const webServerMediaPath = config.get('web-server-media-path');
+
 
 router.post('/consolidate-media', async (req, res) => {
 	const videoSegmentFolder = config.get('video-segment-folder');
@@ -124,4 +130,4 @@ router.get('/', async (req, res) => {
 	res.render('index', renderObject);
 });
 
-module.exports = router;
+export default router;
