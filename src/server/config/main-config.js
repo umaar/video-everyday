@@ -1,23 +1,22 @@
-import rev from 'express-rev'
-import path from 'path'
-import cookieParser from 'cookie-parser'
-import forceDomain from 'forcedomain'
-import bodyParser from 'body-parser'
-import session from 'express-session'
-import flash from 'connect-flash'
-import nunjucks from 'nunjucks'
-import passport from 'passport'
-import config from 'config'
-import compression from 'compression'
-import ConnectSessesionKnex from 'connect-session-knex';
+import path from 'path';
+import rev from 'express-rev';
+import cookieParser from 'cookie-parser';
+import forceDomain from 'forcedomain';
+import bodyParser from 'body-parser';
+import session from 'express-session';
+import flash from 'connect-flash';
+import nunjucks from 'nunjucks';
+import passport from 'passport';
+import config from 'config';
+import compression from 'compression';
+import connectSessesionKnex from 'connect-session-knex';
 import knex from '../db/connection.js';
-import logger from '../logger.js';
 
-const KnexSessionStore = ConnectSessesionKnex(session)
+const KnexSessionStore = connectSessesionKnex(session);
 const store = new KnexSessionStore({knex});
 
 const viewFolders = [
-	// path.join(__dirname, '..', 'views')
+	// Path.join(__dirname, '..', 'views')
 	path.join(process.cwd(), 'src', 'server', 'views')
 ];
 
@@ -25,7 +24,7 @@ const viewFolders = [
 function init(app, express) {
 	app.disable('x-powered-by');
 
-	const nunjucksEnv = nunjucks.configure(viewFolders, {
+	nunjucks.configure(viewFolders, {
 		express: app,
 		autoescape: true,
 		noCache: true
@@ -39,7 +38,7 @@ function init(app, express) {
 	app.set('view engine', 'html');
 
 	// *** Middlewares *** //
-	app.use(compression())
+	app.use(compression());
 
 	app.use(forceDomain({
 		hostname: config.get('hostname'),
@@ -84,9 +83,9 @@ function init(app, express) {
 	const thumbnailsFolder = config.get('thumbnails-folder');
 	app.use(path.join(webServerMediaPath, 'thumbnails'), express.static(thumbnailsFolder));
 
-	// wip
+	// Wip
 	const videoSegmentFolder = config.get('video-segment-folder');
 	app.use(path.join(webServerMediaPath, 'segments'), express.static(videoSegmentFolder));
 }
 
-export default init
+export default init;

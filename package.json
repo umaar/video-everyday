@@ -11,7 +11,8 @@
     "start": "export NODE_ENV=development && nodemon src/server/server.js",
     "build": "./node_modules/gulp/bin/gulp.js build",
     "update-deps": "ncu -u",
-    "test": "xo"
+    "test": "xo",
+    "gulp": "gulp -f gulpfile.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +24,7 @@
     "cookie-parser": "~1.4.4",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
     "exif-reader": "^1.0.3",
     "express": "^4.17.1",
     "express-rev": "^0.1.2",
@@ -61,5 +63,15 @@
     "tiny-lr": "^1.1.1",
     "vinyl-paths": "^3.0.1",
     "xo": "^0.25.3"
+  },
+  "xo": {
+    "no-unused-vars": false,
+    "rules": {
+        "import/extensions": ["error", "always", {
+            "ignorePackages": true
+        }],
+        "unicorn/import-index": 0,
+        "import/no-useless-path-segments": 0
+    }
   }
 }

@@ -1,5 +1,5 @@
 
-function init (app) {
+function init(app) {
 	// Catch 404 and forward to error handler
 	app.use((req, res) => {
 		const err = new Error('Not Found');
@@ -21,4 +21,4 @@ function init (app) {
 	});
 }
 
-export default init
+export default init;

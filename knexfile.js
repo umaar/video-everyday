@@ -1,5 +1,5 @@
 import path from 'path';
-const databaseName = 'video-everyday';;
+const databaseName = 'video-everyday';
 
 const migrationsDirectory = path.join(process.cwd(), '/src/server/db/migrations');
 const seedsDirectory = path.join(process.cwd(), '/src/server/db/seeds');

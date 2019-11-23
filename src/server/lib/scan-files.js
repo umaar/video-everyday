@@ -1,6 +1,6 @@
 import path from 'path';
 import {promises as FSPromises} from 'fs';
-// const fsp = require('fs').promises;
+// Const fsp = require('fs').promises;
 
 async function scan(directoryName, results = []) {
 	const files = await FSPromises.readdir(directoryName, {withFileTypes: true});

@@ -1,3 +1,13 @@
+/* global window */
+
+const {
+	nunjucks,
+	document,
+	fetch,
+	everyDayVideoConfig,
+	tippy
+} = window;
+
 function registerVideoEvents(video) {
 	video.addEventListener('mouseenter', () => {
 		video.controls = true;
@@ -7,15 +17,14 @@ function registerVideoEvents(video) {
 	video.addEventListener('mouseleave', () => {
 		video.controls = false;
 		video.muted = true;
-	})
+	});
 }
 
-
 function replacePrimaryItem(target) {
-	const primaryItemTemplate = "media-grid-primary-item.html";
+	const primaryItemTemplate = 'media-grid-primary-item.html';
 	const renderedTemplate = nunjucks.render(primaryItemTemplate, {
 		mediaItem: {
-			isVideo: target.dataset.isVideo === "true",
+			isVideo: target.dataset.isVideo === 'true',
 			miniVideoSegment: target.dataset.miniVideoSegment,
 			formattedDate: target.dataset.formattedDate
 		}
@@ -33,7 +42,6 @@ function replacePrimaryItem(target) {
 
 function handleConsolidateMedia() {
 	document.querySelector('.consolidate-media').addEventListener('click', async () => {
-
 		const activeMediaItems = [...document.querySelectorAll('.media-grid__alternatives-list-item--active p')].map(activeMedia => {
 			return activeMedia.dataset.name;
 		});
@@ -48,7 +56,11 @@ function handleConsolidateMedia() {
 			body
 		});
 
-		console.log('Result of calling "/consolidate-media"', response);
+		console.log('Result of calling "/consolidate-media"', this);
+
+		if (response.ok) {
+			// Enable the button again
+		}
 	});
 }
 
@@ -57,28 +69,26 @@ async function init() {
 
 	handleConsolidateMedia();
 
-// on  hover, unmute vid
-	for (let video of [...document.querySelectorAll('.media-grid__primary-item video')]) {
+	// On  hover, unmute vid
+	for (const video of [...document.querySelectorAll('.media-grid__primary-item video')]) {
 		registerVideoEvents(video);
 	}
 
 	const alternativeListItemSelector = '.media-grid__alternatives-list-item p';
 	[...document.querySelectorAll(alternativeListItemSelector)].forEach(elm => {
 		elm.addEventListener('click', ({target}) => {
-			replacePrimaryItem(target)
+			replacePrimaryItem(target);
 		});
-	})
+	});
 
-
-	// hover thumbnail feature
-	const thumbnailsAmount = everyDayVideoConfig.thumbnailsAmount
+	// Hover thumbnail feature
+	const {thumbnailsAmount} = everyDayVideoConfig;
 	const alternativeVideoItemSelector = '.media-grid__alternatives-list-item [data-is-video="true"]';
-	const items = [...document.querySelectorAll(alternativeVideoItemSelector)]
+	const items = [...document.querySelectorAll(alternativeVideoItemSelector)];
 	items.forEach(elm => {
 		let interval;
 		let imageIndex = 0;
-		let defaultIntervalTime = 80;
-		let currentIntervalTime = defaultIntervalTime;
+		const defaultIntervalTime = 80;
 
 		tippy(elm, {content: `
 			<img src="/media/thumbnails/${elm.dataset.name}/${imageIndex + 1}.jpg" alt="" />
@@ -90,25 +100,27 @@ async function init() {
 
 					const img = instance.popperChildren.content.querySelector('img');
 					const imgSrc = img.src;
-					img.src = imgSrc.replace(/\d+\.jpg/, `${++imageIndex}.jpg`)
+					img.src = imgSrc.replace(/\d+\.jpg/, `${++imageIndex}.jpg`);
 
 					if (imageIndex === thumbnailsAmount) {
 						slowIntervalTime = 1000;
-						imageIndex = 0
+						imageIndex = 0;
 					}
 
-					return playImages(slowIntervalTime)
-				}, intervalTime)
+					return playImages(slowIntervalTime);
+				}, intervalTime);
 			}
-			playImages()
+
+			playImages();
 		},
 
 		onHidden() {
-			if (interval) clearInterval(interval)
+			if (interval) {
+				clearInterval(interval);
+			}
 		}
 		});
 	});
-
 }
 
 export default {init};

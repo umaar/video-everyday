@@ -1,8 +1,8 @@
 import http from 'http';
 import debug from 'debug';
 
-import logger from './logger.js';
 import config from 'config';
+import logger from './logger.js';
 
 import prepareMedia from './lib/prepare-media.js';
 
@@ -14,14 +14,14 @@ async function init() {
 
 	try {
 		await prepareMedia();
-	} catch (err) {
-		console.log('\nError preparing media, ', err);
-		throw Error(err)
+	} catch (error) {
+		console.log('Error preparing media,', error);
+		throw new Error(error);
 	}
+
 	const port = normalizePort(config.get('port'));
 	logger.info('[System Environment]: ', config.get('environment'));
 	app.set('port', port);
-
 
 	const server = http.createServer(app);
 
@@ -51,12 +51,10 @@ async function init() {
 		switch (error.code) {
 			case 'EACCES':
 				console.error(bind + ' requires elevated privileges');
-				process.exit(1);
-				break;
+				throw new Error('Error making server: EACCES');
 			case 'EADDRINUSE':
 				console.error(bind + ' is already in use');
-				process.exit(1);
-				break;
+				throw new Error('Error making server: EADDRINUSE');
 			default:
 				throw error;
 		}

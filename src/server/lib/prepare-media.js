@@ -1,15 +1,15 @@
-// const syncMediaToDatabase = require('./sync-media-to-database.js');
+// Const syncMediaToDatabase = require('./sync-media-to-database.js');
 // const generateVideosSegment = require('./generate-videos-segment.js');
 import path from 'path';
 import fs from 'fs';
 import config from 'config';
 
+import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import {isValidMediaType, getMediaType} from './is-valid-media-type.js';
 import generateThumbnails from './thumbnails.js';
 import getMediaMetadata from './get-media-metadata.js';
 import generateVideoSegment from './generate-video-segment.js';
 import scanFiles from './scan-files.js';
-import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 
 function hasBracketsInPath(fullPath) {
 	/*
@@ -28,11 +28,10 @@ function checkFoldersExist() {
 		'consolidated-media-folder'
 	];
 
-	for (let folderKey of foldersToCheck) {
+	for (const folderKey of foldersToCheck) {
 		const folder = config.get(folderKey);
 		if (!fs.existsSync(folder)) {
-			throw new Error(`${folder} (the '${folderKey}') does not exist. Exiting`)
-			process.exit(1);
+			throw new Error(`${folder} (the '${folderKey}') does not exist. Exiting`);
 		}
 	}
 }
@@ -43,44 +42,42 @@ async function init() {
 
 	const allMediaInDB = await mediaMetadataQueries.getAllMedia();
 	const allMediaNamesInDB = allMediaInDB.reduce((itemNames, currentItem) => {
-		itemNames.add(currentItem.relativeFilePath)
+		itemNames.add(currentItem.relativeFilePath);
 		return itemNames;
 	}, new Set());
-
-	const itemsToInsert = [];
 
 	const candidateMediaFiles = (await scanFiles(mediaFolder))
 		.filter(item => isValidMediaType(item))
 		.filter(item => !hasBracketsInPath(item))
 		.map(item => {
 			return item.replace(`${mediaFolder}/`, '');
-		})
+		});
 
 	const orphanMediaDBItems = [...allMediaNamesInDB].filter(item => {
-		return !candidateMediaFiles.includes(item)
-	})
+		return !candidateMediaFiles.includes(item);
+	});
 
-	// delete DB records which don't have a corresponding media file
-	for (let orphanMediaDBItem of orphanMediaDBItems) {
+	// Delete DB records which don't have a corresponding media file
+	for (const orphanMediaDBItem of orphanMediaDBItems) {
 		console.log(`Deleting ${orphanMediaDBItem} from DB`);
 		await mediaMetadataQueries.deleteFileEntry(orphanMediaDBItem);
 	}
 
 	// Items already in the database don't need processing again
 	const mediaFilesWhichNeedProcessing = candidateMediaFiles.filter(item => {
-		return !allMediaNamesInDB.has(item)
+		return !allMediaNamesInDB.has(item);
 	});
 
 	let unprocessableMediaCount = 0;
 
-	for (let mediaFile of mediaFilesWhichNeedProcessing) {
+	for (const mediaFile of mediaFilesWhichNeedProcessing) {
 		const isVideo = getMediaType(mediaFile) === 'video';
 		let metadata;
 
 		try {
 			metadata = await getMediaMetadata(path.join(mediaFolder, mediaFile));
-		} catch (err) {
-			console.log(`Error getting metadata`, err);
+		} catch (error) {
+			console.log('Error getting metadata', error);
 		}
 
 		if (!metadata) {
@@ -97,7 +94,7 @@ async function init() {
 		};
 
 		if (isVideo) {
-			DBRecord.videoDuration = metadata.duration
+			DBRecord.videoDuration = metadata.duration;
 
 			const {segmentDuration, relativeVideoSegmentPath} = await generateVideoSegment({
 				mediaFile,

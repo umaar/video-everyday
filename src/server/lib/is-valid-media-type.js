@@ -25,4 +25,4 @@ function getMediaType(mediaPath) {
 export {
 	isValidMediaType,
 	getMediaType
-}
+};

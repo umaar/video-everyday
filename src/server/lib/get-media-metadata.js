@@ -28,17 +28,19 @@ async function getExif(fullPath) {
 		// const contents = await fsp.readFile(`${fullPath}.json`);
 		let androidPhotoMetadataFile;
 		try {
+			//  Needs https://nodejs.org/api/esm.html#esm_experimental_json_modules
 			androidPhotoMetadataFile = require(`${fullPath}.json`);
-		} catch (err) {
+		} catch {
 			console.log(`Couldn't find a matching JSON file for ${fullPath}`);
 			return;
 		}
 
-		const {photoTakenTime} = androidPhotoMetadataFile
+		const {photoTakenTime} = androidPhotoMetadataFile;
 
 		const dateObject = new Date(Date.parse(photoTakenTime.formatted));
 		metadata.timestamp = dateObject;
 		metadata.source = 'android json file';
+		throw new Error('\n\nhandle this: https://nodejs.org/api/esm.html#esm_experimental_json_modules \n\n');
 	}
 
 	return metadata;
@@ -53,7 +55,7 @@ function getVideoMetadata(fullPath) {
 			}
 
 			if (!metadata.format || !metadata.format.tags || !metadata.format.tags.creation_time) {
-				const errorMessage = `ffprobe Metadata for ${fullPath} does not include the creation time or duration`
+				const errorMessage = `ffprobe Metadata for ${fullPath} does not include the creation time or duration`;
 
 				console.log(errorMessage, {metadata});
 				return reject(errorMessage);

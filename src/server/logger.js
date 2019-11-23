@@ -17,6 +17,6 @@ custom.config({
 	displayDate: true
 });
 
-// module.exports = custom;
+// Module.exports = custom;
 
 export default custom;

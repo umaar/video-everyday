@@ -7,7 +7,7 @@ async function getAllMedia() {
 }
 
 async function insert(media) {
-	return await knex(mediaMetadataTableName).insert(media);
+	return knex(mediaMetadataTableName).insert(media);
 }
 
 async function deleteFileEntry(relativeFilePath) {
@@ -20,4 +20,4 @@ export default {
 	insert,
 	getAllMedia,
 	deleteFileEntry
-}
+};

@@ -1,0 +1,16 @@
+{
+  "name": "scripts",
+  "type": "commonjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "exif.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}

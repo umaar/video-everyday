@@ -1,25 +1,19 @@
-// require('dotenv').config();
-import dotenv from 'dotenv';
-// const { promisify } = require('util');
-import { promisify } from 'util';
+import {promisify} from 'util';
 import {exec as execOld} from 'child_process';
-// const exec = promisify(require('child_process').exec)
 import path from 'path';
+import dotenv from 'dotenv';
 import express from 'express';
 import config from 'config';
-import rimraf from "rimraf";
-
-import {app} from '../app-instance.js';
+import rimraf from 'rimraf';
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import {getMediaType} from '../lib/is-valid-media-type.js';
 
-dotenv.config()
-const exec = promisify(execOld)
-const router = express.Router();
+dotenv.config();
+const exec = promisify(execOld);
+const router = express.Router(); // eslint-disable-line new-cap
 
 const webServerMediaPath = config.get('web-server-media-path');
-
 
 router.post('/consolidate-media', async (req, res) => {
 	const videoSegmentFolder = config.get('video-segment-folder');
@@ -27,7 +21,7 @@ router.post('/consolidate-media', async (req, res) => {
 
 	// Naive check that this folder value is legit!
 	if (!consolidatedMediaFolder || consolidatedMediaFolder.length < 10) {
-		throw new Error(`The consolidated-media-folder (${consolidatedMediaFolder}) appears to be invalid`)
+		throw new Error(`The consolidated-media-folder (${consolidatedMediaFolder}) appears to be invalid`);
 	}
 
 	const selectedMediaItemsRaw = req.body;
@@ -37,18 +31,18 @@ router.post('/consolidate-media', async (req, res) => {
 	const selectedMediaItems = selectedMediaItemsRaw.map(selectedMediaItem => {
 		const {defaultVideoSegment} = allMedia.find(item => {
 			return item.relativeFilePath === selectedMediaItem;
-		})
+		});
 
 		return defaultVideoSegment;
 	}).filter(Boolean); // <-- DON'T DO THIS! This is a quick hack for images which are not yet implemented
 
-	if (!selectedMediaItems.length) {
-		throw new Error('Handle this. No selected media items found')
+	if (selectedMediaItems.length === 0) {
+		throw new Error('Handle this. No selected media items found');
 	}
 
 	rimraf.sync(`${consolidatedMediaFolder}/*`);
 
-	for (let [index, val] of selectedMediaItems.entries()) {
+	for (const [index, val] of selectedMediaItems.entries()) {
 		const mediaItem = path.join(videoSegmentFolder, val);
 		const extension = path.parse(mediaItem).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
@@ -56,14 +50,14 @@ router.post('/consolidate-media', async (req, res) => {
 
 		console.log(terminalCommand);
 		// TODO: Resize the videos earlier on in the process
-		const {stderr} = await exec(terminalCommand)
+		const {stderr} = await exec(terminalCommand);
 		console.log(stderr);
 	}
 
 	res.json({
 		ok: true
-	})
-})
+	});
+});
 
 router.get('/', async (req, res) => {
 	const json = (await mediaMetadataQueries.getAllMedia()).sort((a, b) => {
@@ -80,7 +74,7 @@ router.get('/', async (req, res) => {
 
 		return 0;
 	}).map(item => {
-		const isVideo = getMediaType(item.relativeFilePath) === 'video' ? true : false;
+		const isVideo = getMediaType(item.relativeFilePath) === 'video';
 		const createdDate = new Date(item.mediaTakenAt);
 		const videoDuration = Math.round(item.videoDuration);
 		let miniVideoSegment;
@@ -89,38 +83,35 @@ router.get('/', async (req, res) => {
 			const preferredVideoSegment = item.userSelectedVideoSegment ? item.userSelectedVideoSegment : item.defaultVideoSegment;
 			const videoSegment = path.join(webServerMediaPath, 'segments', preferredVideoSegment);
 
-			miniVideoSegment = `${videoSegment}.mini${path.parse(item.relativeFilePath).ext}`
+			miniVideoSegment = `${videoSegment}.mini${path.parse(item.relativeFilePath).ext}`;
 		}
 
 		return {
-			// url: `${webServerMediaPath}/${item.filename}`,
+			// Url: `${webServerMediaPath}/${item.filename}`,
 			url: path.join(webServerMediaPath, item.relativeFilePath),
 			filename: item.relativeFilePath,
-			// name: item.relativeFilePath,
+			// Name: item.relativeFilePath,
 			created: createdDate,
 			formattedDate: createdDate.toDateString(),
 			mediaSource: item.mediaSource,
 			isVideo,
 			videoDuration: `${Math.floor(videoDuration / 60)}:${videoDuration % 60}`,
 			miniVideoSegment
-		}
+		};
 	});
 
-	const thing = json.reduce((prev, cur, ind) => {
+	const thing = json.reduce((prev, cur) => {
 		const currentDateBucket = cur.formattedDate;
 		const existingBucketContents = prev.get(currentDateBucket) || [];
 
-		existingBucketContents.push(cur)
+		existingBucketContents.push(cur);
 
-		const sortedBucketContents = existingBucketContents.sort((a, b) => {
-			return a.isVideo ? -1 : 0
-		})
+		const sortedBucketContents = existingBucketContents.sort(a => a.isVideo ? -1 : 0);
 
-		prev.set(currentDateBucket, sortedBucketContents)
+		prev.set(currentDateBucket, sortedBucketContents);
 
 		return prev;
 	}, new Map());
-
 
 	const renderObject = {
 		messages: req.flash('messages'),

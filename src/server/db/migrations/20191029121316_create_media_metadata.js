@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function (knex) {
 	return knex.schema.createTable('mediaMetadata', table => {
 		table.increments();
 		table.string('relativeFilePath').unique().notNullable();
@@ -11,6 +11,6 @@ exports.up = function(knex, Promise) {
 	});
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function (knex) {
 	return knex.schema.dropTable('mediaMetadata');
 };
