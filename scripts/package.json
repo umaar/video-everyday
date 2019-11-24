@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fluent-ffmpeg": "^2.1.2"
+    "exif-reader": "^1.0.3",
+    "fluent-ffmpeg": "^2.1.2",
+    "sharp": "^0.23.3"
   }
 }

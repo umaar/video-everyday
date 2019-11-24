@@ -55,7 +55,7 @@
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "rollup": "^1.27.3",
+    "rollup": "^1.27.4",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^5.1.2",
@@ -67,11 +67,28 @@
   "xo": {
     "no-unused-vars": false,
     "rules": {
-        "import/extensions": ["error", "always", {
-            "ignorePackages": true
-        }],
-        "unicorn/import-index": 0,
-        "import/no-useless-path-segments": 0
+      "import/extensions": [
+        "error",
+        "always",
+        {
+          "ignorePackages": true
+        }
+      ],
+      "unicorn/import-index": 0,
+      "import/no-useless-path-segments": 0,
+      "unicorn/prevent-abbreviations": [
+        "error",
+        {
+          "checkProperties": false,
+          "checkFilenames": true,
+          "checkVariables": true
+        }
+      ],
+      "unicorn/consistent-function-scoping": 2,
+      "import/first": [
+        "error",
+        "absolute-first"
+      ]
     }
   }
 }

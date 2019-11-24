@@ -1,5 +1,4 @@
 <section>
-	
 	<article>
 		<button class="consolidate-media">
 			Consolidate Media
@@ -9,10 +8,6 @@
 	<ul class="media-grid">
 		{% for dateBucket, mediaItems in dateBuckets %}
 			<li class="media-grid__list-item">
-
-				{% set mediaItem = mediaItems[0] %}
-				{% include './media-grid-primary-item.html' %}
-
 				<ol class="media-grid__alternatives">
 					{% for index in range(0, mediaItems.length) %}
 						{% set mediaItem = mediaItems[index] %}
@@ -35,6 +30,10 @@
 						</li>
 					{% endfor %}
 				</ol>
+
+				{% set mediaItem = mediaItems[0] %}
+				{% include './media-grid-primary-item.html' %}
+
 			</li>
 		{% endfor %}
 	</ul>

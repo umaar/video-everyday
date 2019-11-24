@@ -15,7 +15,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 
 const webServerMediaPath = config.get('web-server-media-path');
 
-router.post('/consolidate-media', async (req, res) => {
+router.post('/consolidate-media', async (request, response) => {
 	const videoSegmentFolder = config.get('video-segment-folder');
 	const consolidatedMediaFolder = config.get('consolidated-media-folder');
 
@@ -24,7 +24,8 @@ router.post('/consolidate-media', async (req, res) => {
 		throw new Error(`The consolidated-media-folder (${consolidatedMediaFolder}) appears to be invalid`);
 	}
 
-	const selectedMediaItemsRaw = req.body;
+	console.time('Consolidate Media')
+	const selectedMediaItemsRaw = request.body;
 	const allMedia = (await mediaMetadataQueries.getAllMedia());
 
 	// TODO: HANDLE IMAGES
@@ -34,32 +35,34 @@ router.post('/consolidate-media', async (req, res) => {
 		});
 
 		return defaultVideoSegment;
-	}).filter(Boolean); // <-- DON'T DO THIS! This is a quick hack for images which are not yet implemented
+	}).filter(Boolean); // <-- DON'T DO THIS! This is a quick hack to exclude images which are not yet implemented
 
 	if (selectedMediaItems.length === 0) {
 		throw new Error('Handle this. No selected media items found');
 	}
 
+	// todo: convert to: https://nodejs.org/api/fs.html#fs_fs_rmdirsync_path_options
 	rimraf.sync(`${consolidatedMediaFolder}/*`);
 
-	for (const [index, val] of selectedMediaItems.entries()) {
-		const mediaItem = path.join(videoSegmentFolder, val);
+	for (const [index, value] of selectedMediaItems.entries()) {
+		const mediaItem = path.join(videoSegmentFolder, value);
 		const extension = path.parse(mediaItem).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
 		const terminalCommand = `cp '${mediaItem}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
 
-		console.log(terminalCommand);
 		// TODO: Resize the videos earlier on in the process
 		const {stderr} = await exec(terminalCommand);
 		console.log(stderr);
 	}
 
-	res.json({
+	console.timeEnd('Consolidate Media')
+
+	response.json({
 		ok: true
 	});
 });
 
-router.get('/', async (req, res) => {
+router.get('/', async (request, response) => {
 	const json = (await mediaMetadataQueries.getAllMedia()).sort((a, b) => {
 		const nameA = a.mediaTakenAt;
 		const nameB = b.mediaTakenAt;
@@ -100,25 +103,25 @@ router.get('/', async (req, res) => {
 		};
 	});
 
-	const thing = json.reduce((prev, cur) => {
-		const currentDateBucket = cur.formattedDate;
-		const existingBucketContents = prev.get(currentDateBucket) || [];
+	const thing = json.reduce((previous, current) => {
+		const currentDateBucket = current.formattedDate;
+		const existingBucketContents = previous.get(currentDateBucket) || [];
 
-		existingBucketContents.push(cur);
+		existingBucketContents.push(current);
 
 		const sortedBucketContents = existingBucketContents.sort(a => a.isVideo ? -1 : 0);
 
-		prev.set(currentDateBucket, sortedBucketContents);
+		previous.set(currentDateBucket, sortedBucketContents);
 
-		return prev;
+		return previous;
 	}, new Map());
 
 	const renderObject = {
-		messages: req.flash('messages'),
+		messages: request.flash('messages'),
 		dateBuckets: thing
 	};
 
-	res.render('index', renderObject);
+	response.render('index', renderObject);
 });
 
 export default router;

@@ -9,6 +9,10 @@ const {
 } = window;
 
 function registerVideoEvents(video) {
+	if (!video || !HTMLVideoElement.prototype.isPrototypeOf(video)) {
+		throw new Error('Have not received a valid video', video)
+	}
+
 	video.addEventListener('mouseenter', () => {
 		video.controls = true;
 		video.muted = false;
@@ -26,7 +30,8 @@ function replacePrimaryItem(target) {
 		mediaItem: {
 			isVideo: target.dataset.isVideo === 'true',
 			miniVideoSegment: target.dataset.miniVideoSegment,
-			formattedDate: target.dataset.formattedDate
+			formattedDate: target.dataset.formattedDate,
+			url: target.dataset.url
 		}
 	});
 
@@ -37,11 +42,15 @@ function replacePrimaryItem(target) {
 	target.parentElement.classList.toggle('media-grid__alternatives-list-item--active');
 
 	const video = target.closest('.media-grid__list-item').querySelector('video');
-	registerVideoEvents(video);
+
+	if (video) {
+		registerVideoEvents(video);
+	}
 }
 
 function handleConsolidateMedia() {
-	document.querySelector('.consolidate-media').addEventListener('click', async () => {
+	document.querySelector('.consolidate-media').addEventListener('click', async (event) => {
+		event.target.disabled = true;
 		const activeMediaItems = [...document.querySelectorAll('.media-grid__alternatives-list-item--active p')].map(activeMedia => {
 			return activeMedia.dataset.name;
 		});
@@ -56,10 +65,9 @@ function handleConsolidateMedia() {
 			body
 		});
 
-		console.log('Result of calling "/consolidate-media"', this);
-
 		if (response.ok) {
 			// Enable the button again
+			event.target.disabled = false;
 		}
 	});
 }
@@ -99,8 +107,8 @@ async function init() {
 					let slowIntervalTime;
 
 					const img = instance.popperChildren.content.querySelector('img');
-					const imgSrc = img.src;
-					img.src = imgSrc.replace(/\d+\.jpg/, `${++imageIndex}.jpg`);
+					const imgSource = img.src;
+					img.src = imgSource.replace(/\d+\.jpg/, `${++imageIndex}.jpg`);
 
 					if (imageIndex === thumbnailsAmount) {
 						slowIntervalTime = 1000;

@@ -101,6 +101,7 @@ async function init() {
 	for (const {absoluteFilePathForMedia, thumbnailFolderForMedia} of videoThumbnailsWhichNeedGenerating) {
 		if (fs.existsSync(thumbnailFolderForMedia)) {
 			console.log(`Deleting ${thumbnailFolderForMedia} as it needs processing again`);
+			// todo: convert to https://nodejs.org/api/fs.html#fs_fs_rmdirsync_path_options
 			rimraf.sync(thumbnailFolderForMedia);
 		}
 
