@@ -24,38 +24,39 @@ router.post('/consolidate-media', async (request, response) => {
 		throw new Error(`The consolidated-media-folder (${consolidatedMediaFolder}) appears to be invalid`);
 	}
 
-	console.time('Consolidate Media')
+	console.time('Consolidate Media');
 	const selectedMediaItemsRaw = request.body;
 	const allMedia = (await mediaMetadataQueries.getAllMedia());
 
-	// TODO: HANDLE IMAGES
 	const selectedMediaItems = selectedMediaItemsRaw.map(selectedMediaItem => {
 		const {defaultVideoSegment} = allMedia.find(item => {
 			return item.relativeFilePath === selectedMediaItem;
 		});
 
 		return defaultVideoSegment;
-	}).filter(Boolean); // <-- DON'T DO THIS! This is a quick hack to exclude images which are not yet implemented
+	}).filter(Boolean);
 
 	if (selectedMediaItems.length === 0) {
 		throw new Error('Handle this. No selected media items found');
 	}
 
-	// todo: convert to: https://nodejs.org/api/fs.html#fs_fs_rmdirsync_path_options
 	rimraf.sync(`${consolidatedMediaFolder}/*`);
 
-	for (const [index, value] of selectedMediaItems.entries()) {
-		const mediaItem = path.join(videoSegmentFolder, value);
-		const extension = path.parse(mediaItem).ext;
+	const selectedMediaItemsPromises = selectedMediaItems.map(async (currentMediaItem, index) => {
+		const mediaItemPath = path.join(videoSegmentFolder, currentMediaItem);
+		const extension = path.parse(mediaItemPath).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
-		const terminalCommand = `cp '${mediaItem}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
-
-		// TODO: Resize the videos earlier on in the process
+		const terminalCommand = `cp '${mediaItemPath}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
+		console.log(terminalCommand);
 		const {stderr} = await exec(terminalCommand);
-		console.log(stderr);
-	}
+		if (stderr) {
+			console.log('stderr', stderr);
+		}
+	});
 
-	console.timeEnd('Consolidate Media')
+	await Promise.all(selectedMediaItemsPromises);
+
+	console.timeEnd('Consolidate Media');
 
 	response.json({
 		ok: true

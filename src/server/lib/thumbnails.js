@@ -98,10 +98,16 @@ async function init() {
 		console.log('No video thumbails need generating');
 	}
 
-	for (const {absoluteFilePathForMedia, thumbnailFolderForMedia} of videoThumbnailsWhichNeedGenerating) {
+	const thumbnailsPromises = videoThumbnailsWhichNeedGenerating.map(async item => {
+		const {absoluteFilePathForMedia, thumbnailFolderForMedia} = item;
+
 		if (fs.existsSync(thumbnailFolderForMedia)) {
+			if (thumbnailFolderForMedia.length < 20) {
+				// Naive check for now
+				throw new Error('Will not delete: ', thumbnailFolderForMedia);
+			}
+
 			console.log(`Deleting ${thumbnailFolderForMedia} as it needs processing again`);
-			// todo: convert to https://nodejs.org/api/fs.html#fs_fs_rmdirsync_path_options
 			rimraf.sync(thumbnailFolderForMedia);
 		}
 
@@ -111,7 +117,9 @@ async function init() {
 			absoluteFilePathForMedia,
 			thumbnailFolderForMedia
 		});
-	}
+	});
+
+	await Promise.all(thumbnailsPromises);
 }
 
 export default init;

@@ -9,10 +9,6 @@ const {
 } = window;
 
 function registerVideoEvents(video) {
-	if (!video || !HTMLVideoElement.prototype.isPrototypeOf(video)) {
-		throw new Error('Have not received a valid video', video)
-	}
-
 	video.addEventListener('mouseenter', () => {
 		video.controls = true;
 		video.muted = false;
@@ -49,7 +45,7 @@ function replacePrimaryItem(target) {
 }
 
 function handleConsolidateMedia() {
-	document.querySelector('.consolidate-media').addEventListener('click', async (event) => {
+	document.querySelector('.consolidate-media').addEventListener('click', async event => {
 		event.target.disabled = true;
 		const activeMediaItems = [...document.querySelectorAll('.media-grid__alternatives-list-item--active p')].map(activeMedia => {
 			return activeMedia.dataset.name;

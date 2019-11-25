@@ -58,10 +58,10 @@ async function init() {
 	});
 
 	// Delete DB records which don't have a corresponding media file
-	for (const orphanMediaDBItem of orphanMediaDBItems) {
+	await Promise.all(orphanMediaDBItems.map(async orphanMediaDBItem => {
 		console.log(`Deleting ${orphanMediaDBItem} from DB`);
 		await mediaMetadataQueries.deleteFileEntry(orphanMediaDBItem);
-	}
+	}));
 
 	// Items already in the database don't need processing again
 	const mediaFilesWhichNeedProcessing = candidateMediaFiles.filter(item => {
@@ -70,7 +70,7 @@ async function init() {
 
 	let unprocessableMediaCount = 0;
 
-	for (const mediaFile of mediaFilesWhichNeedProcessing) {
+	const mediaFilesWhichNeedProcessingPromises = mediaFilesWhichNeedProcessing.map(async mediaFile => {
 		const isVideo = getMediaType(mediaFile) === 'video';
 		let metadata;
 
@@ -83,7 +83,7 @@ async function init() {
 		if (!metadata) {
 			unprocessableMediaCount++;
 			console.log(`${mediaFile} couldn't be processed`);
-			continue;
+			return;
 		}
 
 		const DBRecord = {
@@ -107,9 +107,10 @@ async function init() {
 		}
 
 		await mediaMetadataQueries.insert(DBRecord);
-	}
+	});
 
 	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
+	await Promise.all(mediaFilesWhichNeedProcessingPromises);
 
 	await generateThumbnails();
 }
