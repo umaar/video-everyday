@@ -109,8 +109,8 @@ async function init() {
 		await mediaMetadataQueries.insert(DBRecord);
 	});
 
-	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
 	await Promise.all(mediaFilesWhichNeedProcessingPromises);
+	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
 
 	await generateThumbnails();
 }
