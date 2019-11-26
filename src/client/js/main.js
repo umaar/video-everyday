@@ -4,7 +4,7 @@ import home from './modules/home.js';
 
 function init() {
 	if (window.location.pathname === '/') {
-		home.init()
+		home.init();
 	}
 }
 
