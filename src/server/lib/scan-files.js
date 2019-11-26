@@ -1,18 +1,17 @@
 import path from 'path';
 import {promises as FSPromises} from 'fs';
 
-async function scan(directoryName, results = []) {
-	const files = await FSPromises.readdir(directoryName, {withFileTypes: true});
-	for (const f of files) {
-		const fullPath = path.join(directoryName, f.name);
-		if (f.isDirectory()) {
-			await scan(fullPath, results);
-		} else {
-			results.push(fullPath);
-		}
-	}
+async function scan(directoryName) {
+	const files = await FSPromises.readdir(directoryName, {
+		withFileTypes: true
+	});
 
-	return results;
+	const result = files.map(file => {
+		const fullPath = path.join(directoryName, file.name);
+		return file.isDirectory() ? scan(fullPath) : fullPath;
+	});
+
+	return (await Promise.all(result)).flat();
 }
 
 export default scan;
