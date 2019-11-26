@@ -1,4 +1,4 @@
-import path from 'path';
+const path = require('path');
 const databaseName = 'video-everyday';
 
 const migrationsDirectory = path.join(process.cwd(), '/src/server/db/migrations');
@@ -32,4 +32,5 @@ const config = {
 	}
 };
 
-export default config;
+module.exports = config;
+
