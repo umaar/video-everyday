@@ -37,8 +37,12 @@ async function init({mediaFile, totalVideoDuration}) {
 		const command = `cp '${absoluteFilePathForMedia}' '${videoSegmentFolderForMedia}'`;
 		newFileName = `${parsedMediaFileName.name}${parsedMediaFileName.ext}`;
 		const {stderr} = await exec(command);
-		console.log('Hmm was there an error???:', stderr);
-		throw new Error(stderr);
+
+		// Replace with optional chaining when available
+		if (stderr && stderr.length > 0) {
+			console.log(`stderr in copying file: ${stderr}`);
+			throw new Error(stderr);
+		}
 	}
 
 	const newFileRelativePath = path.join(mediaFile, newFileName);
@@ -50,13 +54,6 @@ async function init({mediaFile, totalVideoDuration}) {
 	const newCommand = `ffmpeg -y -i '${videoSegmentAbsolutePath}' -vf "scale=640:-2" '${videoSegmentAbsolutePath}.mini${ext}'`;
 
 	console.log('Mini video command:', newCommand);
-
-	const {stderr: ffmpegStderr} = await exec(newCommand);
-
-	if (ffmpegStderr) {
-		console.log('Error with ffmpeg', ffmpegStderr);
-		throw new Error(ffmpegStderr);
-	}
 
 	return {
 		relativeVideoSegmentPath: newFileRelativePath,
