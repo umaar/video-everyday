@@ -29,6 +29,7 @@ You will then end up with a folder consisting of ~1 second videos: `0001.mp4 000
 
 # todo
 
+- allow selecting multiple videos/images for a given day (shift + click?) and have them either condensed into a 1-2 second timeframe, or just allow each of them to occupy the usual time amount
 - try `video-segment-duration-seconds` of 1sec and make sure things work
 - ensure working state is clean, and everything is committed, handle config files
 - group `thumbnails-folder`, `video-segment-folder`, `consolidated-media-folder` into one single config value
