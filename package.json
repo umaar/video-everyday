@@ -40,6 +40,7 @@
     "sqlite3": "^4.1.1"
   },
   "devDependencies": {
+    "@umaar/personal-eslint-config": "latest",
     "del": "^5.1.0",
     "gulp-concat": "^2.6.1",
     "gulp": "^4.0.2",
@@ -58,30 +59,6 @@
     "xo": "^0.25.3"
   },
   "xo": {
-    "no-unused-vars": false,
-    "rules": {
-      "import/extensions": [
-        "error",
-        "always",
-        {
-          "ignorePackages": true
-        }
-      ],
-      "unicorn/import-index": 0,
-      "import/no-useless-path-segments": 0,
-      "unicorn/prevent-abbreviations": [
-        "error",
-        {
-          "checkProperties": false,
-          "checkFilenames": true,
-          "checkVariables": true
-        }
-      ],
-      "unicorn/consistent-function-scoping": 2,
-      "import/first": [
-        "error",
-        "absolute-first"
-      ]
-    }
+    "extends": "./node_modules/@umaar/personal-eslint-config/rules.json"
   }
 }
