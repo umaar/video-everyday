@@ -5,6 +5,7 @@ import {exec as execOld} from 'child_process';
 import path from 'path';
 import config from 'config';
 import mkdirp from 'mkdirp';
+import execa from 'execa';
 
 const exec = promisify(execOld);
 const videoSegmentFolder = config.get('video-segment-folder');
@@ -25,7 +26,12 @@ async function init({mediaFile, totalVideoDuration}) {
 		const halfWayMark = Math.floor(totalVideoDuration / 2);
 		const command = `(cd '${videoSegmentFolderForMedia}' && ${MP4BoxBinary} -splitx ${halfWayMark}:${halfWayMark + defaultVideoSegmentDuration} '${absoluteFilePathForMedia}')`;
 
+		const hrtime = process.hrtime()[1];
+
+		console.time(`MP4Box Video Segment Creation ${hrtime}`)
 		const {stderr} = await exec(command);
+		// const {stderr} = await execa(command);
+		console.timeEnd(`MP4Box Video Segment Creation ${hrtime}`)
 
 		const indexOfFileName = stderr.indexOf(parsedMediaFileName.name);
 		const indexOfFileExtension = stderr.indexOf(`${parsedMediaFileName.ext} - duration`);
@@ -53,7 +59,8 @@ async function init({mediaFile, totalVideoDuration}) {
 
 	const newCommand = `ffmpeg -y -i '${videoSegmentAbsolutePath}' -vf "scale=640:-2" '${videoSegmentAbsolutePath}.mini${ext}'`;
 
-	console.log('Mini video command:', newCommand);
+	await exec(newCommand);
+	console.log('This mini video segment has finished creation\n');
 
 	return {
 		relativeVideoSegmentPath: newFileRelativePath,

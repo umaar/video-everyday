@@ -70,7 +70,8 @@ async function init() {
 
 	let unprocessableMediaCount = 0;
 
-	const mediaFilesWhichNeedProcessingPromises = mediaFilesWhichNeedProcessing.map(async mediaFile => {
+	// const mediaFilesWhichNeedProcessingPromises = mediaFilesWhichNeedProcessing.map(async mediaFile => {
+	for (const mediaFile of mediaFilesWhichNeedProcessing) {
 		const isVideo = getMediaType(mediaFile) === 'video';
 		let metadata;
 
@@ -82,8 +83,8 @@ async function init() {
 
 		if (!metadata) {
 			unprocessableMediaCount++;
-			console.log(`${mediaFile} couldn't be processed`);
-			return;
+			console.log(`${mediaFile} couldn't be processed. Skipping this item.`);
+			continue;
 		}
 
 		const DBRecord = {
@@ -107,9 +108,9 @@ async function init() {
 		}
 
 		await mediaMetadataQueries.insert(DBRecord);
-	});
+	}
 
-	await Promise.all(mediaFilesWhichNeedProcessingPromises);
+	// await Promise.all(mediaFilesWhichNeedProcessingPromises);
 	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
 
 	await generateThumbnails();

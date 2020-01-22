@@ -1,7 +1,8 @@
 
 const allowedMediaTypes = {
 	video: ['.mp4', '.mov'],
-	image: ['.jpg', '.jpeg']
+	// Uncomment line below, currently testing issues with video only
+	// image: ['.jpg', '.jpeg']
 };
 
 function isValidMediaType(mediaPath) {
