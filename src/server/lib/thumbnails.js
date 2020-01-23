@@ -98,7 +98,7 @@ async function init() {
 		console.log('No video thumbails need generating');
 	}
 
-	const thumbnailsPromises = videoThumbnailsWhichNeedGenerating.map(async item => {
+	for (const item of videoThumbnailsWhichNeedGenerating) {
 		const {absoluteFilePathForMedia, thumbnailFolderForMedia} = item;
 
 		if (fs.existsSync(thumbnailFolderForMedia)) {
@@ -113,13 +113,11 @@ async function init() {
 
 		mkdirp.sync(thumbnailFolderForMedia);
 
-		await generateThumbnails({
+		await generateThumbnails({ // eslint-disable-line no-await-in-loop
 			absoluteFilePathForMedia,
 			thumbnailFolderForMedia
 		});
-	});
-
-	await Promise.all(thumbnailsPromises);
+	}
 }
 
 export default init;

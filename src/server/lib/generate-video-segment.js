@@ -5,7 +5,6 @@ import {exec as execOld} from 'child_process';
 import path from 'path';
 import config from 'config';
 import mkdirp from 'mkdirp';
-import execa from 'execa';
 
 const exec = promisify(execOld);
 const videoSegmentFolder = config.get('video-segment-folder');
@@ -28,10 +27,9 @@ async function init({mediaFile, totalVideoDuration}) {
 
 		const hrtime = process.hrtime()[1];
 
-		console.time(`MP4Box Video Segment Creation ${hrtime}`)
+		console.time(`MP4Box Video Segment Creation ${hrtime}`);
 		const {stderr} = await exec(command);
-		// const {stderr} = await execa(command);
-		console.timeEnd(`MP4Box Video Segment Creation ${hrtime}`)
+		console.timeEnd(`MP4Box Video Segment Creation ${hrtime}`);
 
 		const indexOfFileName = stderr.indexOf(parsedMediaFileName.name);
 		const indexOfFileExtension = stderr.indexOf(`${parsedMediaFileName.ext} - duration`);

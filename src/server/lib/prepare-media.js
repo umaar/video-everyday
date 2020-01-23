@@ -70,13 +70,12 @@ async function init() {
 
 	let unprocessableMediaCount = 0;
 
-	// const mediaFilesWhichNeedProcessingPromises = mediaFilesWhichNeedProcessing.map(async mediaFile => {
 	for (const mediaFile of mediaFilesWhichNeedProcessing) {
 		const isVideo = getMediaType(mediaFile) === 'video';
 		let metadata;
 
 		try {
-			metadata = await getMediaMetadata(path.join(mediaFolder, mediaFile));
+			metadata = await getMediaMetadata(path.join(mediaFolder, mediaFile)); // eslint-disable-line no-await-in-loop
 		} catch (error) {
 			console.log('Error getting metadata', error);
 		}
@@ -97,7 +96,7 @@ async function init() {
 		if (isVideo) {
 			DBRecord.videoDuration = metadata.duration;
 
-			const {segmentDuration, relativeVideoSegmentPath} = await generateVideoSegment({
+			const {segmentDuration, relativeVideoSegmentPath} = await generateVideoSegment({ // eslint-disable-line no-await-in-loop
 				mediaFile,
 				totalVideoDuration: DBRecord.videoDuration
 			});
@@ -107,10 +106,9 @@ async function init() {
 			DBRecord.defaultVideoSegmentDuration = segmentDuration;
 		}
 
-		await mediaMetadataQueries.insert(DBRecord);
+		await mediaMetadataQueries.insert(DBRecord); // eslint-disable-line no-await-in-loop
 	}
 
-	// await Promise.all(mediaFilesWhichNeedProcessingPromises);
 	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
 
 	await generateThumbnails();

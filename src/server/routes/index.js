@@ -42,19 +42,17 @@ router.post('/consolidate-media', async (request, response) => {
 
 	rimraf.sync(`${consolidatedMediaFolder}/*`);
 
-	const selectedMediaItemsPromises = selectedMediaItems.map(async (currentMediaItem, index) => {
+	for (const [index, currentMediaItem] of selectedMediaItems.entries()) {
 		const mediaItemPath = path.join(videoSegmentFolder, currentMediaItem);
 		const extension = path.parse(mediaItemPath).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
 		const terminalCommand = `cp '${mediaItemPath}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
 		console.log(terminalCommand);
-		const {stderr} = await exec(terminalCommand);
+		const {stderr} = await exec(terminalCommand); // eslint-disable-line no-await-in-loop
 		if (stderr) {
 			console.log('stderr', stderr);
 		}
-	});
-
-	await Promise.all(selectedMediaItemsPromises);
+	}
 
 	console.timeEnd('Consolidate Media');
 

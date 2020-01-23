@@ -1,6 +1,6 @@
 
 const allowedMediaTypes = {
-	video: ['.mp4', '.mov'],
+	video: ['.mp4', '.mov']
 	// Uncomment line below, currently testing issues with video only
 	// image: ['.jpg', '.jpeg']
 };
