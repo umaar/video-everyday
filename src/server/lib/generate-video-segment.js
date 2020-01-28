@@ -2,9 +2,9 @@
 import {promisify} from 'util';
 import {exec as execOld} from 'child_process';
 
+import fs from 'fs';
 import path from 'path';
 import config from 'config';
-import mkdirp from 'mkdirp';
 
 const exec = promisify(execOld);
 const videoSegmentFolder = config.get('video-segment-folder');
@@ -16,7 +16,10 @@ async function init({mediaFile, totalVideoDuration}) {
 	const videoSegmentFolderForMedia = path.join(videoSegmentFolder, mediaFile);
 	const parsedMediaFileName = path.parse(mediaFile);
 
-	mkdirp.sync(videoSegmentFolderForMedia);
+	fs.mkdirSync(videoSegmentFolderForMedia, {
+		recursive: true
+	});
+
 	let newFileName;
 
 	// 5 is a minimum padding, in seconds which the video should have for MP4Box to do a split

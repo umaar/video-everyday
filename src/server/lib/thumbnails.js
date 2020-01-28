@@ -4,7 +4,6 @@ import path from 'path';
 import config from 'config';
 import ffmpeg from 'fluent-ffmpeg';
 import rimraf from 'rimraf';
-import mkdirp from 'mkdirp';
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import scanFiles from './scan-files.js';
@@ -111,7 +110,9 @@ async function init() {
 			rimraf.sync(thumbnailFolderForMedia);
 		}
 
-		mkdirp.sync(thumbnailFolderForMedia);
+		fs.mkdirSync(thumbnailFolderForMedia, {
+			recursive: true
+		});
 
 		await generateThumbnails({ // eslint-disable-line no-await-in-loop
 			absoluteFilePathForMedia,
