@@ -26,7 +26,7 @@ async function init({mediaFile, totalVideoDuration}) {
 	if ((defaultVideoSegmentDuration + 7) < totalVideoDuration) {
 		const MP4BoxBinary = '/Applications/GPAC.app/Contents/MacOS/MP4Box';
 		const halfWayMark = Math.floor(totalVideoDuration / 2);
-		const command = `(cd '${videoSegmentFolderForMedia}' && ${MP4BoxBinary} -splitx ${halfWayMark}:${halfWayMark + defaultVideoSegmentDuration} '${absoluteFilePathForMedia}')`;
+		const command = `(cd ’${videoSegmentFolderForMedia}’ && ${MP4BoxBinary} -splitx ${halfWayMark}:${halfWayMark + defaultVideoSegmentDuration} ’${absoluteFilePathForMedia}’)`;
 
 		const hrtime = process.hrtime()[1];
 
@@ -41,7 +41,7 @@ async function init({mediaFile, totalVideoDuration}) {
 	} else {
 		console.log(`This file is too small for segmenting ${mediaFile} with MP4Box. Will use the whole video file instead.`);
 
-		const command = `cp '${absoluteFilePathForMedia}' '${videoSegmentFolderForMedia}'`;
+		const command = `cp ’${absoluteFilePathForMedia}’ ’${videoSegmentFolderForMedia}’`;
 		newFileName = `${parsedMediaFileName.name}${parsedMediaFileName.ext}`;
 		const {stderr} = await exec(command);
 
@@ -58,7 +58,7 @@ async function init({mediaFile, totalVideoDuration}) {
 
 	const {ext} = path.parse(newFileName);
 
-	const newCommand = `ffmpeg -y -i '${videoSegmentAbsolutePath}' -vf "scale=640:-2" '${videoSegmentAbsolutePath}.mini${ext}'`;
+	const newCommand = `ffmpeg -y -i ’${videoSegmentAbsolutePath}’ -vf "scale=640:-2" ’${videoSegmentAbsolutePath}.mini${ext}’`;
 
 	await exec(newCommand);
 	console.log('This mini video segment has finished creation\n');

@@ -31,7 +31,7 @@ async function getExif(fullPath) {
 			//  Needs https://nodejs.org/api/esm.html#esm_experimental_json_modules
 			androidPhotoMetadataFile = require(`${fullPath}.json`);
 		} catch {
-			console.log(`Couldn't find a matching JSON file for ${fullPath}`);
+			console.log(`Couldn’t find a matching JSON file for ${fullPath}`);
 			return;
 		}
 

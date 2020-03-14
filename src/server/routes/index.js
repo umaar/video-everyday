@@ -46,7 +46,7 @@ router.post('/consolidate-media', async (request, response) => {
 		const mediaItemPath = path.join(videoSegmentFolder, currentMediaItem);
 		const extension = path.parse(mediaItemPath).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
-		const terminalCommand = `cp '${mediaItemPath}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
+		const terminalCommand = `cp ’${mediaItemPath}’ ’${path.join(consolidatedMediaFolder, newFileName)}’`;
 		console.log(terminalCommand);
 		const {stderr} = await exec(terminalCommand); // eslint-disable-line no-await-in-loop
 		if (stderr) {

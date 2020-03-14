@@ -8,14 +8,27 @@ import prepareMedia from './lib/prepare-media.js';
 
 import app from './app.js';
 
+function normalizePort(value) {
+	const port = parseInt(value, 10);
+	if (isNaN(port)) {
+		return value;
+	}
+
+	if (port >= 0) {
+		return port;
+	}
+
+	return false;
+}
+
 async function init() {
-	logger.info('App Starting...');
+	logger.info('App Starting…');
 	debug('herman-express:server');
 
 	try {
 		await prepareMedia();
 	} catch (error) {
-		console.log('Error preparing media,', error);
+		console.log('Error preparing media: ', error);
 		throw new Error(error);
 	}
 
@@ -28,19 +41,6 @@ async function init() {
 	server.listen(port);
 	server.on('error', onError);
 	server.on('listening', onListening);
-
-	function normalizePort(value) {
-		const port = parseInt(value, 10);
-		if (isNaN(port)) {
-			return value;
-		}
-
-		if (port >= 0) {
-			return port;
-		}
-
-		return false;
-	}
 
 	function onError(error) {
 		if (error.syscall !== 'listen') {
