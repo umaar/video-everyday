@@ -29,6 +29,8 @@ You will then end up with a folder consisting of ~1 second videos: `0001.mp4 000
 
 # todo
 
+- Add support for a Job Queue, stored in the DB, which can sequentially process videos even after the web server has started up
+    + Provide a /jobs page which shows pending/in-progress/completed jobs
 - Ensure `dist`/`video-everyday/segments`/etc. are all created on project initialisation
 - allow selecting multiple videos/images for a given day (shift + click?) and have them either condensed into a 1-2 second timeframe, or just allow each of them to occupy the usual time amount
 - try `video-segment-duration-seconds` of 1sec and make sure things work
