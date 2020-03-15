@@ -20,7 +20,7 @@
     "config": "^3.3.0",
     "connect-flash": "^0.1.1",
     "connect-session-knex": "^1.6.0",
-    "cookie-parser": "~1.4.4",
+    "cookie-parser": "~1.4.5",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "exif-reader": "^1.0.3",
@@ -39,7 +39,7 @@
     "subtitle": "^2.0.3"
   },
   "devDependencies": {
-    "@umaar/personal-eslint-config": "latest",
+    "@umaar/personal-eslint-config": "^1.0.2",
     "del": "^5.1.0",
     "gulp-concat": "^2.6.1",
     "gulp": "^4.0.2",

@@ -69,6 +69,6 @@ async function init() {
 }
 
 init().catch(error => {
-	console.log('Exiting...\n\n')
-	process.exit(1);
+	console.log(error, '\nExiting...\n\n');
+	process.exit(1); // eslint-disable-line unicorn/no-process-exit
 });

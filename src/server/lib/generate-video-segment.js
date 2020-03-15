@@ -38,7 +38,7 @@ async function init({mediaFile, totalVideoDuration}) {
 			commandResult = await exec(command);
 		} catch (error) {
 			console.log(error);
-			throw Error(error);
+			throw new Error(error);
 		}
 
 		console.timeEnd(`MP4Box Video Segment Creation ${hrtime}`);
@@ -57,7 +57,7 @@ async function init({mediaFile, totalVideoDuration}) {
 			await exec(command);
 		} catch (error) {
 			console.log(error);
-			throw Error(error);
+			throw new Error(error);
 		}
 	}
 
@@ -73,15 +73,15 @@ async function init({mediaFile, totalVideoDuration}) {
 		await exec(newCommand);
 	} catch (error) {
 		console.log(error);
-		throw Error(error);
+		throw new Error(error);
 	}
 
-	const { duration: actualVideoSegmentDuration } = await getMediaMetadata(path.join(videoSegmentFolder, newFileRelativePath));
+	const {duration: actualVideoSegmentDuration} = await getMediaMetadata(path.join(videoSegmentFolder, newFileRelativePath));
 
 	return {
 		relativeVideoSegmentPath: newFileRelativePath,
 		desiredSegmentDuration: defaultVideoSegmentDuration,
-		actualVideoSegmentDuration: actualVideoSegmentDuration
+		actualVideoSegmentDuration
 	};
 }
 
