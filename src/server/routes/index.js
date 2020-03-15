@@ -1,10 +1,12 @@
 import {promisify} from 'util';
+import {writeFileSync} from 'fs';
 import {exec as execOld} from 'child_process';
 import path from 'path';
 import dotenv from 'dotenv';
 import express from 'express';
 import config from 'config';
 import rimraf from 'rimraf';
+import * as Subtitle from 'subtitle'
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import {getMediaType} from '../lib/is-valid-media-type.js';
@@ -16,6 +18,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 const webServerMediaPath = config.get('web-server-media-path');
 
 router.post('/consolidate-media', async (request, response) => {
+	// TODO: Apply sorting before copying media over
 	const videoSegmentFolder = config.get('video-segment-folder');
 	const consolidatedMediaFolder = config.get('consolidated-media-folder');
 
@@ -29,11 +32,17 @@ router.post('/consolidate-media', async (request, response) => {
 	const allMedia = (await mediaMetadataQueries.getAllMedia());
 
 	const selectedMediaItems = selectedMediaItemsRaw.map(selectedMediaItem => {
-		const {defaultVideoSegment} = allMedia.find(item => {
+		const foundMediaItem = allMedia.find(item => {
 			return item.relativeFilePath === selectedMediaItem;
 		});
 
-		return defaultVideoSegment;
+		if (foundMediaItem) {
+			return {
+				segment: foundMediaItem.defaultVideoSegment,
+				duration: Math.round(foundMediaItem.actualVideoSegmentDuration * 1000),
+				date: new Date(foundMediaItem.mediaTakenAt)
+			};
+		}
 	}).filter(Boolean);
 
 	if (selectedMediaItems.length === 0) {
@@ -42,17 +51,50 @@ router.post('/consolidate-media', async (request, response) => {
 
 	rimraf.sync(`${consolidatedMediaFolder}/*`);
 
-	for (const [index, currentMediaItem] of selectedMediaItems.entries()) {
-		const mediaItemPath = path.join(videoSegmentFolder, currentMediaItem);
+	let subtitleData = [];
+	let ongoingDuration = 0;
+
+	for (const [index, {segment, duration, date}] of selectedMediaItems.entries()) {
+		const mediaItemPath = path.join(videoSegmentFolder, segment);
 		const extension = path.parse(mediaItemPath).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
-		const terminalCommand = `cp ’${mediaItemPath}’ ’${path.join(consolidatedMediaFolder, newFileName)}’`;
+		const terminalCommand = `cp '${mediaItemPath}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
+		
+		// const newFileName = (index + 1).toString().padStart(4, '0') + '.mp4';
+		// const terminalCommand = `ffmpeg -hide_banner -i '${mediaItemPath}' -filter:v "scale=iw*min(1920/iw\\,1080/ih):ih*min(1920/iw\\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\\,1080/ih))/2:(1080-ih*min(1920/iw\\,1080/ih))/2" -c:a copy '${path.join(consolidatedMediaFolder, newFileName)}'`;
+
 		console.log(terminalCommand);
-		const {stderr} = await exec(terminalCommand); // eslint-disable-line no-await-in-loop
-		if (stderr) {
-			console.log('stderr', stderr);
+		
+		console.log(date, duration, segment);
+
+		try {
+			await exec(terminalCommand); // eslint-disable-line no-await-in-loop
+		} catch (error) {
+			console.log(error);
+			throw Error(error);
 		}
+
+		const birthDate = new Date(config.get('birth-date'));	
+		
+		if (index % 2 === 0) {
+			const daysBetween = Math.round((date - birthDate) / (1000 * 3600 * 24));
+			const currentSubtiteData = {
+				start: ongoingDuration,
+				end: ongoingDuration + (duration),
+				text: `${daysBetween} days`
+			};
+			
+			console.log(currentSubtiteData);
+			
+			subtitleData.push(currentSubtiteData);
+			
+		}
+
+		ongoingDuration += duration;
 	}
+
+	const subtitles = Subtitle.default.stringify(subtitleData);
+	writeFileSync(path.join(consolidatedMediaFolder, 'subtitles.srt'), subtitles);
 
 	console.timeEnd('Consolidate Media');
 

@@ -8,3 +8,4 @@ sharp('pic.jpg')
 		console.log(exifProperties);
 		console.log(exifProperties.exif.DateTimeOriginal);
 	});
+

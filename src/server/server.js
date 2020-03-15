@@ -28,8 +28,8 @@ async function init() {
 	try {
 		await prepareMedia();
 	} catch (error) {
-		console.log('Error preparing media: ', error);
-		throw new Error(error);
+		console.log('Error preparing media:\n', error);
+		throw error;
 	}
 
 	const port = normalizePort(config.get('port'));
@@ -68,4 +68,7 @@ async function init() {
 	}
 }
 
-init();
+init().catch(error => {
+	console.log('Exiting...\n\n')
+	process.exit(1);
+});

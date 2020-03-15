@@ -1,5 +1,3 @@
-// Const syncMediaToDatabase = require('./sync-media-to-database.js');
-// const generateVideosSegment = require('./generate-videos-segment.js');
 import path from 'path';
 import fs from 'fs';
 import config from 'config';
@@ -20,24 +18,34 @@ function hasBracketsInPath(fullPath) {
 	return fullPath.match(/\(\d*\)/);
 }
 
-function checkFoldersExist() {
-	const foldersToCheck = [
-		'media-folder',
+function handleFolderChecks() {
+	const foldersToConfirmExists = ['media-folder'];
+
+	const foldersToCreate = [
 		'thumbnails-folder',
 		'video-segment-folder',
 		'consolidated-media-folder'
 	];
 
-	for (const folderKey of foldersToCheck) {
+	for (const folderKey of [...foldersToConfirmExists, ...foldersToCreate]) {
 		const folder = config.get(folderKey);
-		if (!fs.existsSync(folder)) {
-			throw new Error(`${folder} (the '${folderKey}') does not exist. Exiting`);
+		const folderExists = fs.existsSync(folder);
+
+		if (!folderExists) {
+			if (foldersToConfirmExists.includes(folderKey)) {
+				throw new Error(`${folder} (the ’${folderKey}’) does not exist. Exiting`);
+			} else {
+				console.log(`${folderKey} does not exist. Creating ${folder}`);
+				fs.mkdirSync(folder, {
+					recursive: true
+				});
+			}
 		}
 	}
 }
 
 async function init() {
-	checkFoldersExist();
+	handleFolderChecks();
 	const mediaFolder = config.get('media-folder');
 
 	const allMediaInDB = await mediaMetadataQueries.getAllMedia();
@@ -82,7 +90,7 @@ async function init() {
 
 		if (!metadata) {
 			unprocessableMediaCount++;
-			console.log(`${mediaFile} couldn't be processed. Skipping this item.`);
+			console.log(`${mediaFile} couldn’t be processed. Skipping this item.`);
 			continue;
 		}
 
@@ -96,20 +104,25 @@ async function init() {
 		if (isVideo) {
 			DBRecord.videoDuration = metadata.duration;
 
-			const {segmentDuration, relativeVideoSegmentPath} = await generateVideoSegment({ // eslint-disable-line no-await-in-loop
+			const {
+				desiredSegmentDuration,
+				relativeVideoSegmentPath,
+				actualVideoSegmentDuration
+			} = await generateVideoSegment({ // eslint-disable-line no-await-in-loop
 				mediaFile,
 				totalVideoDuration: DBRecord.videoDuration
 			});
 
 			console.log(`New Video Segment: ${relativeVideoSegmentPath}`);
 			DBRecord.defaultVideoSegment = relativeVideoSegmentPath;
-			DBRecord.defaultVideoSegmentDuration = segmentDuration;
+			DBRecord.defaultDesiredVideoSegmentDuration = desiredSegmentDuration;
+			DBRecord.actualVideoSegmentDuration = actualVideoSegmentDuration;
 		}
 
 		await mediaMetadataQueries.insert(DBRecord); // eslint-disable-line no-await-in-loop
 	}
 
-	console.log(`${unprocessableMediaCount} media items couldn't be processed`);
+	console.log(`${unprocessableMediaCount} media items couldn’t be processed`);
 
 	await generateThumbnails();
 }

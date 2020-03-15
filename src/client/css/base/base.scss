@@ -30,7 +30,6 @@ ul, ol {
 
 .alert {
 	@include container;
-
 	@media screen and (max-width: $mobile-breakpoint) {
 		margin: 20px;
 		width: initial;
