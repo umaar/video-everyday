@@ -1,0 +1,16 @@
+{
+	"cookieSecret": "__SAMPLE_KEY__",
+	"hostname": "localhost:3000",
+	"domain": "http://localhost:3000",
+	"environment": "development",
+	"productName": "Video Everyday",
+	"port": 3000,
+	"media-folder": "/path/to/your/media",
+	"web-server-media-path": "/media",
+	"thumbnails-folder": "/path/to/your/thumbnails",
+	"video-segment-folder": "/path/to/your/segments",
+	"consolidated-media-folder": "/path/to/your/consolidated",
+	"thumbnails-amount": 4,
+	"video-segment-duration-seconds": 2,
+	"birth-date": "01 January 2000"
+}
