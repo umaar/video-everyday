@@ -30,7 +30,7 @@ You will then end up with a folder consisting of ~1 second videos: `0001.mp4 000
 # todo
 
 - Doocument the process of stitching together consolidated media + burning in subtitles (and resize to fit)
-- If `MP4Box` fails, use ffmpeg instead for shorter segments
+- If `MP4Box` fails, use ffmpeg instead for shorter segments. _Edit_: Should I Use FFMPEG regardless?  MP4Box is not very accurate. Need to benchmark the overall times 
 - Add support for a Job Queue, stored in the DB, which can sequentially process videos even after the web server has started up
     + Provide a /jobs page which shows pending/in-progress/completed jobs
 - allow selecting multiple videos/images for a given day (shift + click?) and have them either condensed into a 1-2 second timeframe, or just allow each of them to occupy the usual time amount
@@ -71,7 +71,7 @@ You will then end up with a folder consisting of ~1 second videos: `0001.mp4 000
 ffmpeg -ss 00:01:00 -t 2 -i ~/Downloads/tmp/VID_20191020_113153.mp4 ./dist/foo.mp4
 
 
-# Similar (slow but accurate and working), not what the difference is
+# Similar (slow but accurate and working), not sure what the difference is
 
 ffmpeg -i ~/Downloads/tmp/VID_20191020_113153.mp4 -ss 10 -strict -2 -t 2 ./dist/foo.mp4
 

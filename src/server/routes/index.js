@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import express from 'express';
 import config from 'config';
 import rimraf from 'rimraf';
+import moment from 'moment';
+
 import * as Subtitle from 'subtitle';
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
@@ -56,7 +58,11 @@ router.post('/consolidate-media', async (request, response) => {
 	const subtitleData = [];
 	let ongoingDuration = 0;
 
-	for (const [index, {segment, duration, date}] of selectedMediaItems.entries()) {
+	for (const [index, {
+		segment,
+		duration,
+		date: mediaDate
+	}] of selectedMediaItems.entries()) {
 		const mediaItemPath = path.join(videoSegmentFolder, segment);
 		const extension = path.parse(mediaItemPath).ext;
 		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
@@ -64,10 +70,6 @@ router.post('/consolidate-media', async (request, response) => {
 
 		// Const newFileName = (index + 1).toString().padStart(4, '0') + '.mp4';
 		// const terminalCommand = `ffmpeg -hide_banner -i '${mediaItemPath}' -filter:v "scale=iw*min(1920/iw\\,1080/ih):ih*min(1920/iw\\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\\,1080/ih))/2:(1080-ih*min(1920/iw\\,1080/ih))/2" -c:a copy '${path.join(consolidatedMediaFolder, newFileName)}'`;
-
-		console.log(terminalCommand);
-
-		console.log(date, duration, segment);
 
 		try {
 			await exec(terminalCommand); // eslint-disable-line no-await-in-loop
@@ -78,17 +80,37 @@ router.post('/consolidate-media', async (request, response) => {
 
 		const birthDate = new Date(config.get('birth-date'));
 
-		if (index % 2 === 0) {
-			const daysBetween = Math.round((date - birthDate) / (1000 * 3600 * 24));
-			const currentSubtiteData = {
+		let differenceString = '';
+
+		const b = moment(birthDate);
+		const a = moment(mediaDate);
+
+		const years = a.diff(b, 'year');
+		b.add(years, 'years');
+
+		const months = a.diff(b, 'months');
+		b.add(months, 'months');
+
+		const days = a.diff(b, 'days');
+
+		if (years !== 0) {
+			differenceString += `${years} years `;
+		}
+
+		differenceString += `${months} months`;
+
+		if (days > 0) {
+			differenceString += ` ${days} day${days > 1 ? 's' : ''}`;
+		}
+
+		if (index % 3 === 0) {
+			subtitleData.push({
 				start: ongoingDuration,
-				end: ongoingDuration + (duration),
-				text: `${daysBetween} days`
-			};
-
-			console.log(currentSubtiteData);
-
-			subtitleData.push(currentSubtiteData);
+				// End: ongoingDuration + (duration),
+				// 1 second is often too short for a subtitle, this keps it there for longer
+				end: (ongoingDuration + (duration)) + 1200,
+				text: differenceString
+			});
 		}
 
 		ongoingDuration += duration;
@@ -132,10 +154,8 @@ router.get('/', async (request, response) => {
 		}
 
 		return {
-			// Url: `${webServerMediaPath}/${item.filename}`,
 			url: path.join(webServerMediaPath, item.relativeFilePath),
 			filename: item.relativeFilePath,
-			// Name: item.relativeFilePath,
 			created: createdDate,
 			formattedDate: createdDate.toDateString(),
 			mediaSource: item.mediaSource,

@@ -54,20 +54,30 @@ function getVideoMetadata(fullPath) {
 				return reject(error);
 			}
 
-			if (!metadata.format || !metadata.format.tags || !metadata.format.tags.creation_time) {
-				const errorMessage = `ffprobe Metadata for ${fullPath} does not include the creation time or duration`;
-
-				console.log(errorMessage, {metadata});
-				return reject(errorMessage);
-			}
-
-			resolve({
-				timestamp: new Date(metadata.format.tags.creation_time),
-				duration: metadata.format.duration,
-				source: 'ffprobe'
-			});
+			return resolve(metadata);
 		});
 	});
+}
+
+async function getAllVideoMetadata(fullPath) {
+	const metadata = await getVideoMetadata(fullPath);
+	if (!metadata.format || !metadata.format.tags || !metadata.format.tags.creation_time) {
+		const errorMessage = `ffprobe Metadata for ${fullPath} does not include the creation time or duration`;
+
+		console.log(errorMessage, {metadata});
+		throw new Error(errorMessage);
+	}
+
+	return {
+		timestamp: new Date(metadata.format.tags.creation_time),
+		duration: metadata.format.duration,
+		source: 'ffprobe'
+	};
+}
+
+async function getVideoDuration(fullPath) {
+	const metadata = await getVideoMetadata(fullPath);
+	return metadata.format.duration;
 }
 
 async function getMetadata(fullPath) {
@@ -78,8 +88,9 @@ async function getMetadata(fullPath) {
 	}
 
 	if (mediaCategory === 'video') {
-		return getVideoMetadata(fullPath);
+		return getAllVideoMetadata(fullPath);
 	}
 }
 
 export default getMetadata;
+export {getVideoDuration};

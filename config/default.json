@@ -11,6 +11,6 @@
 	"video-segment-folder": "/path/to/your/segments",
 	"consolidated-media-folder": "/path/to/your/consolidated",
 	"thumbnails-amount": 4,
-	"video-segment-duration-seconds": 2,
+	"video-segment-duration-seconds": 1,
 	"birth-date": "01 January 2000"
 }

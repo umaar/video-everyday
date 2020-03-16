@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import config from 'config';
 
-import getMediaMetadata from './get-media-metadata.js';
+import {getVideoDuration} from './get-media-metadata.js';
 
 const exec = promisify(execOld);
 const videoSegmentFolder = config.get('video-segment-folder');
@@ -22,8 +22,26 @@ async function init({mediaFile, totalVideoDuration}) {
 		recursive: true
 	});
 
-	let newFileName;
+	const newFileName = `${parsedMediaFileName.name}-segment${parsedMediaFileName.ext}`;
+	// Ffmpeg -i VID_20191210_112221.mp4  -ss 10 -to 11 -c copy cut.mp4
+	// const ffmpegBinary = '/usr/local/bin/ffmpeg';
+	const halfWayMark = Math.floor(totalVideoDuration / 2);
+	// Const command = `(cd '${videoSegmentFolderForMedia}' && ${ffmpeg} -splitx ${halfWayMark}:${halfWayMark + defaultVideoSegmentDuration} '${absoluteFilePathForMedia}')`;
+	const command = `ffmpeg  -hide_banner  -i '${absoluteFilePathForMedia}' -ss ${halfWayMark} -strict -2 -to ${halfWayMark + defaultVideoSegmentDuration} '${path.join(videoSegmentFolderForMedia, newFileName)}'`;
 
+	const hrtime = process.hrtime()[1];
+
+	console.time(`ffmpeg Video Segment Creation ${hrtime}`);
+	try {
+		await exec(command);
+	} catch (error) {
+		console.log(error);
+		throw new Error(error);
+	}
+
+	console.timeEnd(`ffmpeg Video Segment Creation ${hrtime}`);
+
+	/*
 	// 5 is a minimum padding, in seconds which the video should have for MP4Box to do a split
 	if ((defaultVideoSegmentDuration + 7) < totalVideoDuration) {
 		const MP4BoxBinary = '/Applications/GPAC.app/Contents/MacOS/MP4Box';
@@ -60,6 +78,7 @@ async function init({mediaFile, totalVideoDuration}) {
 			throw new Error(error);
 		}
 	}
+	*/
 
 	const newFileRelativePath = path.join(mediaFile, newFileName);
 
@@ -76,7 +95,7 @@ async function init({mediaFile, totalVideoDuration}) {
 		throw new Error(error);
 	}
 
-	const {duration: actualVideoSegmentDuration} = await getMediaMetadata(path.join(videoSegmentFolder, newFileRelativePath));
+	const actualVideoSegmentDuration = await getVideoDuration(path.join(videoSegmentFolder, newFileRelativePath));
 
 	return {
 		relativeVideoSegmentPath: newFileRelativePath,
