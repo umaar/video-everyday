@@ -2,11 +2,13 @@
 
 [![Actions Status](https://github.com/umaar/video-everyday/workflows/Node%20CI/badge.svg)](https://github.com/umaar/video-everyday/actions)
 
-This project helps create a "1 second everyday"-style video using your __existing media__. If you've recorded lots of videos, taken lots of pictures, with your phone for example, can turn all of that into a condensed video.
+This project helps create a "1 second everyday"-style video using your __existing media__.
+
+If you've recorded lots of videos, taken lots of pictures, with your phone for example, you can turn all of that into a condensed compilation video in an automated manner.
 
 ### To get started
 
-1. Configure `media-folder` in `default.json` to point to a folder location where all your media is stored
+1. Configure the relevant values in `default.json`
 2. Run `npm install && npm run migrate-db-dev`
 3. Run the following:
 
@@ -18,9 +20,17 @@ npm start
 npm run gulp
 ```
 
-4. Then open up `localhost:3000`
+4. Then open up `http://localhost:3000`
 
-You will then end up with a folder consisting of ~1 second videos: `0001.mp4 0002.mp4 0003.MOV 0004.MOV 0005.MOV 0006.MOV 0007.mp4 0008.mp4 0009.mp4 0010.MOV` and so on. You can then drag these into your video tool of choice, and join them all toegther. As an example, if using Screenflow:
+The web interface allows you to (optionally) select which media to use in your final compilation videos. If you don't select anything, you can rely on the defaults.
+
+5. When you're happy with your selection, click `consolidate media` in the web app.
+
+6. You will then end up with a folder consisting of ~1 second videos:
+
+`0001.mp4 0002.mp4 0003.MOV`
+
+...and so on. You can then drag these into your video tool of choice, and join them all toegther. As an example, if using Screenflow:
 
 1. Drag all files (`0001.mp4, 0002.mp4` etc.) into screenflow
 2. Select all clips
