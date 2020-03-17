@@ -103,15 +103,11 @@ router.post('/consolidate-media', async (request, response) => {
 			differenceString += ` ${days} day${days > 1 ? 's' : ''}`;
 		}
 
-		if (index % 3 === 0) {
-			subtitleData.push({
-				start: ongoingDuration,
-				// End: ongoingDuration + (duration),
-				// 1 second is often too short for a subtitle, this keps it there for longer
-				end: (ongoingDuration + (duration)) + 1200,
-				text: differenceString
-			});
-		}
+		subtitleData.push({
+			start: ongoingDuration,
+			end: ongoingDuration + duration,
+			text: differenceString
+		});
 
 		ongoingDuration += duration;
 	}
