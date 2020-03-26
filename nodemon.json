@@ -1,4 +1,6 @@
 {
-  "ignore": ["src/client/*", "dist/*"],
-  "ext": "html js css"
+  "ignore": ["src/*.*"],
+  "ext": "js,html",
+  "delay": "1000",
+  "watch": ["dist/"]
 }

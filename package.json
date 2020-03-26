@@ -17,7 +17,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
-    "config": "^3.3.0",
+    "config": "^3.3.1",
     "connect-flash": "^0.1.1",
     "connect-session-knex": "^1.6.0",
     "cookie-parser": "~1.4.5",
@@ -29,12 +29,12 @@
     "express-session": "^1.17.0",
     "fluent-ffmpeg": "^2.1.2",
     "forcedomain": "^2.0.0",
-    "knex": "^0.20.12",
+    "knex": "^0.20.13",
     "moment": "^2.24.0",
     "nunjucks": "^3.2.1",
     "passport": "^0.4.1",
     "rimraf": "^3.0.2",
-    "sharp": "^0.25.1",
+    "sharp": "^0.25.2",
     "signale": "^1.4.0",
     "sqlite3": "^4.1.1",
     "subtitle": "^2.0.3"
@@ -50,13 +50,13 @@
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "rollup": "^2.1.0",
+    "rollup": "^2.2.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^5.3.0",
     "tiny-lr": "^1.1.1",
     "vinyl-paths": "^3.0.1",
-    "xo": "^0.28.0"
+    "xo": "^0.28.1"
   },
   "xo": {
     "extends": "./node_modules/@umaar/personal-eslint-config/rules.json"

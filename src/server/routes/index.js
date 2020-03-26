@@ -42,7 +42,7 @@ router.post('/consolidate-media', async (request, response) => {
 			return {
 				segment: foundMediaItem.defaultVideoSegment,
 				duration: Math.round(foundMediaItem.actualVideoSegmentDuration * 1000),
-				date: new Date(foundMediaItem.mediaTakenAt)
+				mediaDate: new Date(foundMediaItem.mediaTakenAt)
 			};
 		}
 
@@ -61,7 +61,7 @@ router.post('/consolidate-media', async (request, response) => {
 	for (const [index, {
 		segment,
 		duration,
-		date: mediaDate
+		mediaDate
 	}] of selectedMediaItems.entries()) {
 		const mediaItemPath = path.join(videoSegmentFolder, segment);
 		const extension = path.parse(mediaItemPath).ext;
@@ -82,8 +82,10 @@ router.post('/consolidate-media', async (request, response) => {
 
 		let differenceString = '';
 
+		// TODO: Validate `birthDate` is a valid date
 		const b = moment(birthDate);
 		const a = moment(mediaDate);
+		
 
 		const years = a.diff(b, 'year');
 		b.add(years, 'years');

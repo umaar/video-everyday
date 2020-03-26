@@ -15,14 +15,13 @@ import knex from '../db/connection.js';
 const KnexSessionStore = connectSessesionKnex(session);
 const store = new KnexSessionStore({knex});
 
-const viewFolders = [
-	// Path.join(__dirname, '..', 'views')
-	path.join(process.cwd(), 'src', 'server', 'views')
-];
-
 // Load environment variables
 function init(app, express) {
 	app.disable('x-powered-by');
+
+	const viewFolders = [
+		path.join(process.cwd(), 'src', 'server', 'views')
+	];
 
 	nunjucks.configure(viewFolders, {
 		express: app,
