@@ -50,13 +50,13 @@
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "rollup": "^2.2.0",
+    "rollup": "^2.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^5.3.0",
     "tiny-lr": "^1.1.1",
     "vinyl-paths": "^3.0.1",
-    "xo": "^0.28.1"
+    "xo": "^0.28.3"
   },
   "xo": {
     "extends": "./node_modules/@umaar/personal-eslint-config/rules.json"

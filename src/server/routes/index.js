@@ -20,7 +20,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 const webServerMediaPath = config.get('web-server-media-path');
 
 router.post('/consolidate-media', async (request, response) => {
-	// TODO: Apply sorting before copying media over
+	// Still need to apply sorting before copying media over
 	const videoSegmentFolder = config.get('video-segment-folder');
 	const consolidatedMediaFolder = config.get('consolidated-media-folder');
 
@@ -82,10 +82,9 @@ router.post('/consolidate-media', async (request, response) => {
 
 		let differenceString = '';
 
-		// TODO: Validate `birthDate` is a valid date
+		// Need to validate `birthDate` is a valid date
 		const b = moment(birthDate);
 		const a = moment(mediaDate);
-		
 
 		const years = a.diff(b, 'year');
 		b.add(years, 'years');
