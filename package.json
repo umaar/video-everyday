@@ -26,10 +26,10 @@
     "exif-reader": "^1.0.3",
     "express": "^4.17.1",
     "express-rev": "^0.1.2",
-    "express-session": "^1.17.0",
+    "express-session": "^1.17.1",
     "fluent-ffmpeg": "^2.1.2",
     "forcedomain": "^2.0.0",
-    "knex": "^0.20.13",
+    "knex": "^0.21.0",
     "moment": "^2.24.0",
     "nunjucks": "^3.2.1",
     "passport": "^0.4.1",
@@ -50,13 +50,13 @@
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "rollup": "^2.3.3",
+    "rollup": "^2.6.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^5.3.0",
     "tiny-lr": "^1.1.1",
     "vinyl-paths": "^3.0.1",
-    "xo": "^0.28.3"
+    "xo": "^0.29.1"
   },
   "xo": {
     "extends": "./node_modules/@umaar/personal-eslint-config/rules.json"
