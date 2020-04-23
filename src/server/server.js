@@ -9,8 +9,8 @@ import prepareMedia from './lib/prepare-media.js';
 import app from './app.js';
 
 function normalizePort(value) {
-	const port = parseInt(value, 10);
-	if (isNaN(port)) {
+	const port = Number.parseInt(value, 10);
+	if (Number.isNaN(port)) {
 		return value;
 	}
 
