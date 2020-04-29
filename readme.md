@@ -9,15 +9,15 @@ If you've recorded lots of videos, taken lots of pictures, with your phone for e
 ### To get started
 
 1. Configure the relevant values in `default.json`
-2. Run `npm install && npm run migrate-db-dev`
+2. Run `npm install && make migrate`
 3. Run the following:
 
 ```sh
-# in one tab
-npm start
+make build
+node src/server/server.js
 
-# in another tab
-npm run gulp
+# or to develop:
+# make start
 ```
 
 4. Then open up `http://localhost:3000`

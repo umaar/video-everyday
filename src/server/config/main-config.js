@@ -1,5 +1,4 @@
 import path from 'path';
-import rev from 'express-rev';
 import cookieParser from 'cookie-parser';
 import forceDomain from 'forcedomain';
 import bodyParser from 'body-parser';
@@ -11,6 +10,7 @@ import config from 'config';
 import compression from 'compression';
 import connectSessesionKnex from 'connect-session-knex';
 import knex from '../db/connection.js';
+import revisionManifest from './revision-manifest.js';
 
 const KnexSessionStore = connectSessesionKnex(session);
 const store = new KnexSessionStore({knex});
@@ -44,10 +44,7 @@ function init(app, express) {
 		protocol: 'https'
 	}));
 
-	app.use(rev({
-		manifest: 'dist/rev-manifest.json',
-		prepend: ''
-	}));
+	app.use(revisionManifest());
 
 	app.use(cookieParser());
 	app.use(bodyParser.json());

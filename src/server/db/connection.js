@@ -1,7 +1,7 @@
-import config from 'config';
 import knex from 'knex';
-import knexConfig from '../../../knexfile.cjs';
+// @ts-ignore
+import * as knexConfig from '../../../knexfile.mjs';
 
-const DBConnection = knex(knexConfig[config.get('environment')]);
+const DBConnection = knex(knexConfig);
 
 export default DBConnection;
