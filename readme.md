@@ -4,6 +4,10 @@
 
 This project helps create a "1 second everyday"-style video using your __existing media__.
 
+![Demo of Video Everyday output](demo.gif)
+
+###### Thanks to Fig Vids for the footage! Go check out their [YouTube Channel](https://www.youtube.com/channel/UCPcQxhv9uNPef_DrXdF1_hg)
+
 If you've recorded lots of videos, taken lots of pictures, with your phone for example, you can turn all of that into a condensed compilation video in an automated manner.
 
 ### To get started

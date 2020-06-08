@@ -30,6 +30,7 @@ async function init({mediaFile, totalVideoDuration}) {
 	const command = `ffmpeg  -hide_banner  -i '${absoluteFilePathForMedia}' -ss ${halfWayMark} -strict -2 -to ${halfWayMark + defaultVideoSegmentDuration} '${path.join(videoSegmentFolderForMedia, newFileName)}'`;
 
 	const hrtime = process.hrtime()[1];
+	console.log(command);
 
 	console.time(`ffmpeg Video Segment Creation ${hrtime}`);
 	try {
