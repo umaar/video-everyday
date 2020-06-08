@@ -8,7 +8,11 @@ This project helps create a "1 second everyday"-style video using your __existin
 
 ###### Thanks to Fig Vids for the footage! Go check out their [YouTube Channel](https://www.youtube.com/channel/UCPcQxhv9uNPef_DrXdF1_hg)
 
-If you've recorded lots of videos, taken lots of pictures, with your phone for example, you can turn all of that into a condensed compilation video in an automated manner.
+---
+
+### What is this?
+
+If you've recorded lots of videos (e.g. with your phone), you use this code to turn all of that into a compilation video, for example showing 1 second of your life every day.
 
 ### To get started
 
