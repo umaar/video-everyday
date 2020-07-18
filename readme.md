@@ -47,6 +47,15 @@ The web interface allows you to (optionally) select which media to use in your f
 
 # todo
 
+- Persist choices to DB
+- Playlist functionality (so you can make multiple videos)
+    + Needs 1x choices table
+        * fields: choice_id, date bucket, media item ID, 
+    + needs a playlists table
+        * CRUD support for playlist names
+        * Creation of a new playlist entry needs new records in the choices table (i.e. the defaults)
+        * Feature enhancement: copy this playlist to a new one
+- Audit log for a single day, so you can see when the media item selection was changed
 - Doocument the process of stitching together consolidated media + burning in subtitles (and resize to fit)
 - If `MP4Box` fails, use ffmpeg instead for shorter segments. _Edit_: Should I Use FFMPEG regardless?  MP4Box is not very accurate. Need to benchmark the overall times 
 - Add support for a Job Queue, stored in the DB, which can sequentially process videos even after the web server has started up

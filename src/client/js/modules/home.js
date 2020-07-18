@@ -127,4 +127,6 @@ async function init() {
 	});
 }
 
-export default {init};
+const exports = {init};
+
+export default exports;

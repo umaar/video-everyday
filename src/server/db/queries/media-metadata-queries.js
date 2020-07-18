@@ -16,8 +16,10 @@ async function deleteFileEntry(relativeFilePath) {
 		.del();
 }
 
-export default {
+const exports = {
 	insert,
 	getAllMedia,
 	deleteFileEntry
 };
+
+export default exports;
