@@ -5,6 +5,8 @@ ENV ?= development
 
 install:
 	npm install
+	echo '' > node_modules/interpret/mjs-stub.js
+	echo 'Doing a weird hack to address https://github.com/knex/knex/issues/3882'
 
 update-deps:
 	ncu -u
@@ -22,7 +24,7 @@ reset:
 	rm -rf ~/Downloads/video-everyday/segments/*
 	rm -rf ~/Downloads/video-everyday/thumbnails/*
 	rm db-development-video-everyday.sqlite
-	npm run migrate-db-dev
+	make migrate
 
 clean-dist:
 	rm -rf dist

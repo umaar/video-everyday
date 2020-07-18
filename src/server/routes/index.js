@@ -11,6 +11,7 @@ import moment from 'moment';
 import * as Subtitle from 'subtitle';
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
+import playlistsQueries from '../db/queries/playlists-queries.js';
 import {getMediaType} from '../lib/is-valid-media-type.js';
 
 dotenv.config();
@@ -18,6 +19,51 @@ const exec = promisify(execOld);
 const router = express.Router(); // eslint-disable-line new-cap
 
 const webServerMediaPath = config.get('web-server-media-path');
+
+router.get('/playlists', async (request, response) => {
+	const playlists = await playlistsQueries.getAllPlaylists();
+
+	const renderObject = {
+		playlists
+	};
+
+	response.render('playlists', renderObject);
+});
+
+router.post('/playlists', async (request, response) => {
+	const newPlaylistName = request.body['playlist-name'];
+
+	if (!newPlaylistName) {
+		throw new Error('No playlist name provided!');
+	}
+
+	await playlistsQueries.insert(newPlaylistName);
+
+	// Add to choices table!
+
+	request.flash('messages', {
+		status: 'success',
+		value: 'Playlist created'
+	});
+
+	response.redirect('/playlists');
+});
+
+router.post('/playlist/:slug', async (request, response) => {
+	const newPlaylistName = request.body['playlist-name'];
+	const oldSlug = request.params.slug;
+
+	if (!newPlaylistName) {
+		throw new Error('No playlist name provided!');
+	}
+
+	await playlistsQueries.update({
+		newPlaylistName,
+		oldSlug
+	});
+
+	response.redirect('/playlists');
+});
 
 router.post('/consolidate-media', async (request, response) => {
 	// Still need to apply sorting before copying media over

@@ -4,8 +4,10 @@ $container-width: 1280px;
 $primary-blue: #2879ff;
 
 @import 'base/base';
+@import 'base/mvp';
 @import 'components/footer';
 @import 'components/nav';
 @import 'components/button';
 @import 'pages/home';
+@import 'pages/playlists';
 

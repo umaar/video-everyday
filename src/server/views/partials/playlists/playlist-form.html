@@ -1,0 +1,17 @@
+<div class="form-group">
+    <label for="playlist-name">Name</label>
+
+    <input
+        id="playlist-name"
+        type="text"
+        name="playlist-name"
+        class="form-control"
+        {% if playlistName %}
+            value="{{playlistName}}"
+        {% else %}
+        🖼  placeholder="My new playlist 1"
+        {% endif %}
+    >
+</div>
+
+<button type="submit" class="btn btn-default">Submit</button>

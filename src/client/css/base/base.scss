@@ -10,19 +10,6 @@
 
 * { box-sizing: border-box }
 
-body {
-	font-family: 'Open Sans', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	margin: 0;
-	padding: 0;
-	padding-bottom: 10px;
-	background: white;
-}
-
-a {
-	color: #00B7FF;
-}
 
 ul, ol {
 	padding-left: 0;
@@ -58,29 +45,4 @@ ul, ol {
 
 .container {
 	@include container;
-}
-
-input[type="submit"],
-button[type="submit"] {
-	font-size: 15px;
-	padding: 10px;
-}
-
-.form-group {
-	margin: 25px 0;
-	display: flex;
-	flex-direction: column;
-
-	label {
-		margin-bottom: 10px;
-	}
-
-
-	button[type="submit"],
-	input[type="password"],
-	input[type="email"] {
-		padding: 10px;
-		border: 1px solid #ddd;
-		font-size: 15px;
-	}
 }

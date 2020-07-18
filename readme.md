@@ -49,8 +49,6 @@ The web interface allows you to (optionally) select which media to use in your f
 
 - Persist choices to DB
 - Playlist functionality (so you can make multiple videos)
-    + Needs 1x choices table
-        * fields: choice_id, date bucket, media item ID, 
     + needs a playlists table
         * CRUD support for playlist names
         * Creation of a new playlist entry needs new records in the choices table (i.e. the defaults)

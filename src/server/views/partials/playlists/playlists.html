@@ -1,0 +1,32 @@
+<article>
+	<h2>Your Playlists ({{playlists.length}})</h2>
+
+	<form action="/playlists" method="post">
+		{% include './playlist-form.html' %}
+	</form>
+
+	<ul class="playlists-list">
+		{% for playlist in playlists %}
+			<li>
+				<a href="/playlists/{{playlist.slug}}">{{playlist.name}}</a>
+
+				<details open>
+					<summary>Extra</summary>
+
+					<p>
+						Created: {{playlist.created_at}}
+					</p>
+
+					<p>
+						Updated: {{playlist.updated_at}}
+					</p>
+
+					<form action="/playlist/{{playlist.slug}}" method="post">
+						{% set playlistName = playlist.name %}
+						{% include './playlist-form.html' %}
+					</form>
+				</details>
+			</li>
+		{% endfor %}
+	</ul>
+</article>
