@@ -1,18 +1,17 @@
 <div class="media-grid__primary-item">
-	{% if mediaItem.isVideo %}
-		<!-- WIP: Used to be mediaItem.url -->
+	{% if selectedMediaItem.isVideo %}
 		<video
 			class="testy"
 			muted
 			autoplay
 			loop
-			src="{{mediaItem.miniVideoSegment}}">
+			src="{{selectedMediaItem.miniVideoSegment}}">
 		</video>
 	{% else %}
-		<img src="{{mediaItem.url}}" loading="lazy">
+		<img src="{{selectedMediaItem.url}}" loading="lazy">
 	{% endif %}
 
 	<p class="media-grid__primary-item__date">
-		{{mediaItem.formattedDate}}
+		{{selectedMediaItem.formattedDate}}
 	</p>
 </div>

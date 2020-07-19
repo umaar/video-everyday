@@ -8,8 +8,8 @@ exports.up = function (knex) {
 			.onUpdate('CASCADE')
 			.onDelete('CASCADE');
 
-		table.integer('playlists_id')
-			.references('id')
+		table.integer('playlists_slug')
+			.references('slug')
 			.inTable('playlists')
 			.onUpdate('CASCADE')
 			.onDelete('CASCADE');

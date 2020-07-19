@@ -24,10 +24,17 @@ async function update({newPlaylistName, oldSlug}) {
 		.where('slug', oldSlug);
 }
 
+async function getPlaylistBySlug(slug) {
+	return knex(playlistsTableName)
+		.where('slug', slug)
+		.first();
+}
+
 const exports = {
 	insert,
 	getAllPlaylists,
-	update
+	update,
+	getPlaylistBySlug
 };
 
 export default exports;

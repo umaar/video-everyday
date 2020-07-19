@@ -8,7 +8,7 @@
 	<ul class="playlists-list">
 		{% for playlist in playlists %}
 			<li>
-				<a href="/playlists/{{playlist.slug}}">{{playlist.name}}</a>
+				<a href="/playlist/{{playlist.slug}}">{{playlist.name}}</a>
 
 				<details open>
 					<summary>Extra</summary>
@@ -21,7 +21,7 @@
 						Updated: {{playlist.updated_at}}
 					</p>
 
-					<form action="/playlist/{{playlist.slug}}" method="post">
+					<form action="/playlists/{{playlist.slug}}" method="post">
 						{% set playlistName = playlist.name %}
 						{% include './playlist-form.html' %}
 					</form>

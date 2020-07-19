@@ -12,6 +12,7 @@ import * as Subtitle from 'subtitle';
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import playlistsQueries from '../db/queries/playlists-queries.js';
+import choicesQueries from '../db/queries/choices-queries.js';
 import {getMediaType} from '../lib/is-valid-media-type.js';
 
 dotenv.config();
@@ -24,7 +25,8 @@ router.get('/playlists', async (request, response) => {
 	const playlists = await playlistsQueries.getAllPlaylists();
 
 	const renderObject = {
-		playlists
+		playlists,
+		messages: request.flash('messages')
 	};
 
 	response.render('playlists', renderObject);
@@ -37,19 +39,26 @@ router.post('/playlists', async (request, response) => {
 		throw new Error('No playlist name provided!');
 	}
 
-	await playlistsQueries.insert(newPlaylistName);
+	try {
+		await playlistsQueries.insert(newPlaylistName);
 
-	// Add to choices table!
+		request.flash('messages', {
+			status: 'success',
+			value: 'Playlist created'
+		});
+	} catch (err) {
+		console.log(err);
 
-	request.flash('messages', {
-		status: 'success',
-		value: 'Playlist created'
-	});
+		request.flash('messages', {
+			status: 'danger',
+			value: 'Creating that playlist failed'
+		});
+	}
 
 	response.redirect('/playlists');
 });
 
-router.post('/playlist/:slug', async (request, response) => {
+router.post('/playlists/:slug', async (request, response) => {
 	const newPlaylistName = request.body['playlist-name'];
 	const oldSlug = request.params.slug;
 
@@ -57,11 +66,24 @@ router.post('/playlist/:slug', async (request, response) => {
 		throw new Error('No playlist name provided!');
 	}
 
-	await playlistsQueries.update({
-		newPlaylistName,
-		oldSlug
-	});
+	try {
+		await playlistsQueries.update({
+			newPlaylistName,
+			oldSlug
+		});
 
+		request.flash('messages', {
+			status: 'success',
+			value: 'Updating that playlist name was successful'
+		});
+	} catch (err) {
+		console.log(err);
+		
+		request.flash('messages', {
+			status: 'danger',
+			value: 'Could not update the playlist title'
+		});
+	}
 	response.redirect('/playlists');
 });
 
@@ -169,7 +191,20 @@ router.post('/consolidate-media', async (request, response) => {
 	});
 });
 
-router.get('/', async (request, response) => {
+router.get('/playlist/:slug', async (request, response) => {
+	const playlistSlug = request.params.slug;
+
+	const currentPlaylist = await playlistsQueries.getPlaylistBySlug(playlistSlug);
+
+	if (!currentPlaylist) {
+		request.flash('messages', {
+			status: 'danger',
+			value: 'That playlist does not exist'
+		});
+
+		return response.redirect('/playlists');
+	}
+
 	const json = (await mediaMetadataQueries.getAllMedia()).sort((a, b) => {
 		const nameA = a.mediaTakenAt;
 		const nameB = b.mediaTakenAt;
@@ -204,29 +239,78 @@ router.get('/', async (request, response) => {
 			mediaSource: item.mediaSource,
 			isVideo,
 			videoDuration: `${Math.floor(videoDuration / 60)}:${videoDuration % 60}`,
-			miniVideoSegment
+			miniVideoSegment,
+			id: item.id
 		};
 	});
 
-	const thing = json.reduce((previous, current) => {
+	const dateBuckets = json.reduce((previous, current) => {
 		const currentDateBucket = current.formattedDate;
 		const existingBucketContents = previous.get(currentDateBucket) || [];
 
 		existingBucketContents.push(current);
 
 		const sortedBucketContents = existingBucketContents.sort(a => a.isVideo ? -1 : 0);
-
 		previous.set(currentDateBucket, sortedBucketContents);
 
 		return previous;
 	}, new Map());
 
+	const allChoices = (await choicesQueries.getChoicesByPlaylistSlug(playlistSlug))
+		.map(item => {
+			const formattedDate = new Date(item.mediaTakenAt).toDateString()
+			return {
+				...item,
+				formattedDate
+			};
+		});
+
+	const dateBucketsWithSelectedItems = [...dateBuckets].reduce((previous, current) => {
+		const [dateTitle, items] = current;
+		const matchingChoice = allChoices.find(({formattedDate}) => dateTitle === formattedDate);
+		let matchingItemIndex = 0;
+
+		if (matchingChoice) {
+			matchingItemIndex = items.findIndex(({id}) => id === matchingChoice.mediaMetadata_id);
+		}
+
+
+		items[matchingItemIndex].isSelected = true;
+
+		const value = {
+			selectedMediaItem: items[matchingItemIndex],
+			items
+		}
+
+		previous.set(dateTitle, value);
+		return previous;
+	}, new Map());
+
 	const renderObject = {
 		messages: request.flash('messages'),
-		dateBuckets: thing
+		dateBuckets: dateBucketsWithSelectedItems
 	};
 
 	response.render('index', renderObject);
+});
+
+router.post('/playlist/:slug', async (request, response) => {
+	const slug = request.params.slug;
+
+	if (!slug) {
+		throw new Error('No playlist slug provided!');
+	}
+
+	const id = request.body.id;
+
+	await choicesQueries.insertChoice({
+		mediaMetadata_id: id,
+		playlists_slug: slug
+	});
+
+	response.json({
+		ok: true
+	});
 });
 
 export default router;

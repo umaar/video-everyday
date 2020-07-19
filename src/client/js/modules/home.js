@@ -23,7 +23,7 @@ function registerVideoEvents(video) {
 function replacePrimaryItem(target) {
 	const primaryItemTemplate = 'media-grid-primary-item.html';
 	const renderedTemplate = nunjucks.render(primaryItemTemplate, {
-		mediaItem: {
+		selectedMediaItem: {
 			isVideo: target.dataset.isVideo === 'true',
 			miniVideoSegment: target.dataset.miniVideoSegment,
 			formattedDate: target.dataset.formattedDate,
@@ -68,6 +68,19 @@ function handleConsolidateMedia() {
 	});
 }
 
+async function postUpdatedChoice(id) {
+	// empty string posts to the current URL
+	await fetch('', {
+		method: 'POST',
+		headers: {
+		  'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			id
+		})
+	});
+}
+
 async function init() {
 	console.log('Home!');
 
@@ -80,8 +93,9 @@ async function init() {
 
 	const alternativeListItemSelector = '.media-grid__alternatives-list-item p';
 	[...document.querySelectorAll(alternativeListItemSelector)].forEach(elm => {
-		elm.addEventListener('click', ({target}) => {
+		elm.addEventListener('click', async ({target}) => {
 			replacePrimaryItem(target);
+			await postUpdatedChoice(target.dataset.id);
 		});
 	});
 

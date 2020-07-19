@@ -16,10 +16,15 @@ async function deleteFileEntry(relativeFilePath) {
 		.del();
 }
 
+async function getItemByID(id) {
+	return knex(mediaMetadataTableName).where('id', id).first();
+}
+
 const exports = {
 	insert,
 	getAllMedia,
-	deleteFileEntry
+	deleteFileEntry,
+	getItemByID
 };
 
 export default exports;
