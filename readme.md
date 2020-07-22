@@ -47,11 +47,13 @@ The web interface allows you to (optionally) select which media to use in your f
 
 # todo
 
-- Persist choices to DB
+- Support deselecting a media item
+- 'Resolution' e.g. output videos every day, every other day, every week, month, year
+    + Algorithm something like: 
+        * For each video in a playlist, also considering user-defined choices, iterate through a date object until a video is found (until we've hit the next milestone)
+            - Resolution Every month = check 1st Jan 2020 - no video? Move onto 2nd Jan 2020 until a video is found, then increment the appropriate type and appropriate amount e.g. increment `month` by `1`
 - Playlist functionality (so you can make multiple videos)
     + needs a playlists table
-        * CRUD support for playlist names
-        * Creation of a new playlist entry needs new records in the choices table (i.e. the defaults)
         * Feature enhancement: copy this playlist to a new one
 - Audit log for a single day, so you can see when the media item selection was changed
 - Doocument the process of stitching together consolidated media + burning in subtitles (and resize to fit)
@@ -85,48 +87,48 @@ The web interface allows you to (optionally) select which media to use in your f
 
 ### scripts WIP
 
-```sh
-# takes less than a second to execute, but includes black frames at the start
-
- ffmpeg -ss 00:01:00 -i ~/Downloads/tmp/VID_20191020_113153.mp4 -t 3 -c copy -avoid_negative_ts 1 ./dist/test.mp4
-
-
-# takes 1 min, but is a correctly formatted video file
-
-ffmpeg -ss 00:01:00 -t 2 -i ~/Downloads/tmp/VID_20191020_113153.mp4 ./dist/foo.mp4
-
-
-# Similar (slow but accurate and working), not sure what the difference is
-
-ffmpeg -i ~/Downloads/tmp/VID_20191020_113153.mp4 -ss 10 -strict -2 -t 2 ./dist/foo.mp4
-
-# finally, using mp4box works!
-
-/Applications/GPAC.app/Contents/MacOS/MP4Box -splitx 10:12 ~/Downloads/tmp/VID_20191020_115217.mp4
-
-# after this, it'll need resizing
-
-ffmpeg -i VID_20191020_115217_14_17.mp4 -vf scale=640:-1 output.mp4
-
 # these 1-2 second MP4 might be slow to watch, so how about displaying a sped up version either by:
 # changing the vid.playbackRate in JS, or, using ffmpeg:
+
+```sh
 ffmpeg -i $1 -r 10 -vcodec png out-static-%05d.png
+```
 
 # command to overlay text on a video
 
+```sh
 ffmpeg -i 0009.mp4 -vf drawtext="fontfile=~/Library/Fonts/FiraCode-Bold.ttf: text='some text!':fontsize=80:fontcolor=white:x=100:y=100" 0009-text.mp4
-
-# This command will concatenate videos of the same format/size
-
-ffmpeg -f concat -i mp4s.txt -fflags +genpts mp4s.mp4
-
-# mp4box concat is super fast...but only if files are the same resolution
-/Applications/GPAC.app/Contents/MacOS/MP4Box -cat scaled/1.mp4 -cat scaled/2.mp4 -cat scaled/3.mp4 -cat scaled/4.mp4 -cat scaled/5.mp4 -new mp4box.mp4
-
-
-# scaling videos working - run this on all videos, then do a ffmpeg concat https://superuser.com/a/547406
-
-ffmpeg  -i footage/6.MOV -filter:v "scale=iw*min(1920/iw\,1080/ih):ih*min(1920/iw\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\,1080/ih))/2:(1080-ih*min(1920/iw\,1080/ih))/2" -c:a copy scaled/6.mp4
-
 ```
 
+
+
+
+
+# Scaling videos - run this on all videos, then do a ffmpeg concat https://superuser.com/a/547406
+
+```sh
+ffmpeg  -i 0091.mp4 -filter:v "scale=iw*min(1920/iw\,1080/ih):ih*min(1920/iw\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\,1080/ih))/2:(1080-ih*min(1920/iw\,1080/ih))/2" -c:a copy scaled/0091.mkv
+```
+
+# Concatenating
+
+This command will concatenate videos of the same format/size - confirmed working july 2020, must however use MKV files *not* mp4s for the final output. Input can be .mov or .mp4
+
+```sh
+ffmpeg -safe 0 -f concat -segment_time_metadata 1 -i files.txt -vf select=concatdec_select -af aselect=concatdec_select,aresample=async=1 final.mkv
+```
+
+## files.txt
+
+```txt
+file 'scaled/0001.mkv'
+file 'scaled/0002.mkv'
+file 'scaled/0003.mkv'
+```
+
+# subtitles
+
+```sh
+ffmpeg -i scaled/out.mkv  -filter:v subtitles=subtitles.srt scaled/out-subtitles.mkv
+
+```
