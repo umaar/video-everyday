@@ -2,13 +2,13 @@ exports.up = function (knex) {
 	return knex.schema.createTable('choices', table => {
 		table.increments();
 
-		table.integer('mediaMetadata_id')
+		table.integer('mediaMetadataID')
 			.references('id')
 			.inTable('mediaMetadata')
 			.onUpdate('CASCADE')
 			.onDelete('CASCADE');
 
-		table.integer('playlists_slug')
+		table.integer('playlistsSlug')
 			.references('slug')
 			.inTable('playlists')
 			.onUpdate('CASCADE')
