@@ -10,7 +10,7 @@
 	"video-segment-folder": "/path/to/your/segments",
 	"consolidated-media-folder": "/path/to/your/consolidated",
 	"web-server-media-path": "/media",
-	"thumbnails-amount": 4,
+	"thumbnails-amount": 20,
 	"video-segment-duration-seconds": 1,
 	"birth-date": "01 January 2000"
 }

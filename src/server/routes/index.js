@@ -13,6 +13,7 @@ import * as Subtitle from 'subtitle';
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import playlistsQueries from '../db/queries/playlists-queries.js';
 import choicesQueries from '../db/queries/choices-queries.js';
+import exclusionsQueries from '../db/queries/exclusions-queries.js';
 import {getMediaType} from '../lib/is-valid-media-type.js';
 
 dotenv.config();
@@ -20,6 +21,10 @@ const exec = promisify(execOld);
 const router = express.Router(); // eslint-disable-line new-cap
 
 const webServerMediaPath = config.get('web-server-media-path');
+
+router.get('/', async (request, response) => {
+	response.redirect('/playlists');
+});
 
 router.get('/playlists', async (request, response) => {
 	const playlists = await playlistsQueries.getAllPlaylists();
@@ -46,8 +51,8 @@ router.post('/playlists', async (request, response) => {
 			status: 'success',
 			value: 'Playlist created'
 		});
-	} catch (err) {
-		console.log(err);
+	} catch (error) {
+		console.log(error);
 
 		request.flash('messages', {
 			status: 'danger',
@@ -76,14 +81,15 @@ router.post('/playlists/:slug', async (request, response) => {
 			status: 'success',
 			value: 'Updating that playlist name was successful'
 		});
-	} catch (err) {
-		console.log(err);
-		
+	} catch (error) {
+		console.log(error);
+
 		request.flash('messages', {
 			status: 'danger',
 			value: 'Could not update the playlist title'
 		});
 	}
+
 	response.redirect('/playlists');
 });
 
@@ -125,6 +131,7 @@ router.post('/consolidate-media', async (request, response) => {
 
 	const subtitleData = [];
 	let ongoingDuration = 0;
+	const listOfFinalSegmentsForFFMPEG = [];
 
 	for (const [index, {
 		segment,
@@ -132,12 +139,20 @@ router.post('/consolidate-media', async (request, response) => {
 		mediaDate
 	}] of selectedMediaItems.entries()) {
 		const mediaItemPath = path.join(videoSegmentFolder, segment);
-		const extension = path.parse(mediaItemPath).ext;
-		const newFileName = (index + 1).toString().padStart(4, '0') + extension;
-		const terminalCommand = `cp '${mediaItemPath}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
+		const targetExtension = '.mp4';
+		// Const extension = path.parse(mediaItemPath).ext;
+		// const newFileName = (index + 1).toString().padStart(4, '0') + extension;
+		// const targetExtension = `.mkv`;
+		const newFileName = (index + 1).toString().padStart(4, '0') + targetExtension;
+		// Const terminalCommand = `cp '${mediaItemPath}' '${path.join(consolidatedMediaFolder, newFileName)}'`;
 
-		// Const newFileName = (index + 1).toString().padStart(4, '0') + '.mp4';
-		// const terminalCommand = `ffmpeg -hide_banner -i '${mediaItemPath}' -filter:v "scale=iw*min(1920/iw\\,1080/ih):ih*min(1920/iw\\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\\,1080/ih))/2:(1080-ih*min(1920/iw\\,1080/ih))/2" -c:a copy '${path.join(consolidatedMediaFolder, newFileName)}'`;
+		const fullOutputPath = path.join(consolidatedMediaFolder, newFileName);
+
+		const terminalCommand = `ffmpeg -hide_banner -i '${mediaItemPath}' -filter:v "scale=iw*min(1920/iw\\,1080/ih):ih*min(1920/iw\\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\\,1080/ih))/2:(1080-ih*min(1920/iw\\,1080/ih))/2" -c:a copy '${fullOutputPath}'`;
+
+		// Ffmpeg  -i 0091.mp4 -filter:v "scale=iw*min(1920/iw\,1080/ih):ih*min(1920/iw\,1080/ih), pad=1920:1080:(1920-iw*min(1920/iw\,1080/ih))/2:(1080-ih*min(1920/iw\,1080/ih))/2" -c:a copy scaled/0091.mkv
+
+		console.log('Scaling:\n', terminalCommand);
 
 		try {
 			await exec(terminalCommand); // eslint-disable-line no-await-in-loop
@@ -179,10 +194,34 @@ router.post('/consolidate-media', async (request, response) => {
 		});
 
 		ongoingDuration += duration;
+
+		console.log('Subtitles');
+		const subtitles = Subtitle.default.stringify([{
+			start: 0,
+			end: 10000,
+			text: differenceString
+		}]);
+
+		const fullPathToSubtitleFile = path.join(consolidatedMediaFolder, `${newFileName}.srt`);
+		writeFileSync(fullPathToSubtitleFile, subtitles);
+
+		const subtitledFileName = newFileName.replace(targetExtension, '-subtitled' + targetExtension);
+		const subtitleTerminalCommand = `ffmpeg -i '${fullOutputPath}'  -filter:v subtitles='${fullPathToSubtitleFile}' '${path.join(consolidatedMediaFolder, subtitledFileName)}'`;
+
+		console.log('Burn in subtitle:\n', subtitleTerminalCommand);
+
+		try {
+			await exec(subtitleTerminalCommand); // eslint-disable-line no-await-in-loop
+		} catch (error) {
+			console.log(error);
+			throw new Error(error);
+		}
 	}
 
 	const subtitles = Subtitle.default.stringify(subtitleData);
 	writeFileSync(path.join(consolidatedMediaFolder, 'subtitles.srt'), subtitles);
+
+	listOfFinalSegmentsForFFMPEG.map(fileName => console.log(`file '${fileName}'`));
 
 	console.timeEnd('Consolidate Media');
 
@@ -258,29 +297,36 @@ router.get('/playlist/:slug', async (request, response) => {
 
 	const allChoices = (await choicesQueries.getChoicesByPlaylistSlug(playlistSlug))
 		.map(item => {
-			const formattedDate = new Date(item.mediaTakenAt).toDateString()
+			const formattedDate = new Date(item.mediaTakenAt).toDateString();
 			return {
 				...item,
 				formattedDate
 			};
 		});
 
+	const exclusions = await exclusionsQueries.getExclusionsByPlaylistsSlug(playlistSlug);
+
 	const dateBucketsWithSelectedItems = [...dateBuckets].reduce((previous, current) => {
 		const [dateTitle, items] = current;
+
+		const isCurrentDateExcluded = exclusions.has(dateTitle);
+
 		const matchingChoice = allChoices.find(({formattedDate}) => dateTitle === formattedDate);
 		let matchingItemIndex = 0;
 
 		if (matchingChoice) {
-			matchingItemIndex = items.findIndex(({id}) => id === matchingChoice.mediaMetadata_id);
+			matchingItemIndex = items.findIndex(({id}) => id === matchingChoice.mediaMetadataID);
 		}
 
-
-		items[matchingItemIndex].isSelected = true;
+		if (!isCurrentDateExcluded) {
+			items[matchingItemIndex].isSelected = true;
+		}
 
 		const value = {
 			selectedMediaItem: items[matchingItemIndex],
-			items
-		}
+			items,
+			excluded: isCurrentDateExcluded
+		};
 
 		previous.set(dateTitle, value);
 		return previous;
@@ -295,18 +341,35 @@ router.get('/playlist/:slug', async (request, response) => {
 });
 
 router.post('/playlist/:slug', async (request, response) => {
-	const slug = request.params.slug;
+	const playlistsSlug = request.params.slug;
 
-	if (!slug) {
+	if (!playlistsSlug) {
 		throw new Error('No playlist slug provided!');
 	}
 
 	const id = request.body.id;
 
-	await choicesQueries.insertChoice({
-		mediaMetadata_id: id,
-		playlists_slug: slug
-	});
+	if (id) {
+		await choicesQueries.insertChoice({
+			mediaMetadataID: id,
+			playlistsSlug
+		});
+	} else {
+		const formattedDate = request.body.formattedDate;
+		const shouldRemove = request.body.remove;
+
+		if (shouldRemove) {
+			await exclusionsQueries.remove({
+				playlistsSlug,
+				formattedDate
+			});
+		} else {
+			await exclusionsQueries.insert({
+				playlistsSlug,
+				formattedDate
+			});
+		}
+	}
 
 	response.json({
 		ok: true

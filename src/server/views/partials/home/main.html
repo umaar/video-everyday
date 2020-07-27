@@ -1,42 +1,39 @@
-<section>
-	<article>
-		<button class="consolidate-media">
-			Consolidate Media
-		</button>
-	</article>
+<article>
+	<button class="consolidate-media">
+		Consolidate Media
+	</button>
+</article>
 
-	<ul class="media-grid">
-		{% for bucketTitle, dateBucket in dateBuckets %}
-			<li class="media-grid__list-item">
-				<ol class="media-grid__alternatives">
-					{% for mediaItem in dateBucket.items %}						
-						{% if mediaItem.isSelected %}
-							<li class="media-grid__alternatives-list-item media-grid__alternatives-list-item--active">
-						{% else %}
-							<li class="media-grid__alternatives-list-item">
-						{% endif %}
-							<p
-								data-is-video="{{mediaItem.isVideo}}"
-								data-formatted-date="{{mediaItem.formattedDate}}"
-								data-url="{{mediaItem.url}}"
-								data-name="{{mediaItem.filename}}"
-								data-mini-video-segment="{{mediaItem.miniVideoSegment}}"
-								data-id="{{mediaItem.id}}"
-							>
-								{% if mediaItem.isVideo %}
-									🎥️ &nbsp;{{mediaItem.videoDuration}}
-								{% else %}
-									🖼️
-								{% endif %}
-								{{mediaItem.filename}}
-							</p>
-						</li>
-					{% endfor %}
-				</ol>
+<ul class="media-grid">
+	{% for bucketTitle, dateBucket in dateBuckets %}
+		<li class='media-grid__list-item {{ "media-grid__list-item--excluded" if dateBucket.excluded }} '>
+			<ol class="media-grid__alternatives">
+				{% for mediaItem in dateBucket.items %}						
+					{% if mediaItem.isSelected %}
+						<li class="media-grid__alternatives-list-item media-grid__alternatives-list-item--active">
+					{% else %}
+						<li class="media-grid__alternatives-list-item">
+					{% endif %}
+						<p
+							data-is-video="{{mediaItem.isVideo}}"
+							data-formatted-date="{{mediaItem.formattedDate}}"
+							data-url="{{mediaItem.url}}"
+							data-name="{{mediaItem.filename}}"
+							data-mini-video-segment="{{mediaItem.miniVideoSegment}}"
+							data-id="{{mediaItem.id}}"
+						>
+							{% if mediaItem.isVideo %}
+								🎥️ &nbsp;{{mediaItem.videoDuration}}
+							{% else %}
+								🖼️
+							{% endif %}
+						</p>
+					</li>
+				{% endfor %}
+			</ol>
 
-				{% set selectedMediaItem = dateBucket.selectedMediaItem %}
-				{% include './media-grid-primary-item.html' %}
-			</li>
-		{% endfor %}
-	</ul>
-</section>
+			{% set selectedMediaItem = dateBucket.selectedMediaItem %}
+			{% include './media-grid-primary-item.html' %}
+		</li>
+	{% endfor %}
+</ul>

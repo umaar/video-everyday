@@ -1,5 +1,5 @@
-import knex from '../connection.js';
 import slugify from 'slugify';
+import knex from '../connection.js';
 
 const playlistsTableName = 'playlists';
 
@@ -19,7 +19,7 @@ async function update({newPlaylistName, oldSlug}) {
 		.update({
 			name: newPlaylistName,
 			slug: slugify(newPlaylistName),
-			updated_at: new Date().toISOString()
+			updated_at: new Date().toISOString() // eslint-disable-line camelcase
 		})
 		.where('slug', oldSlug);
 }
