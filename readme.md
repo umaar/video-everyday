@@ -47,6 +47,8 @@ The web interface allows you to (optionally) select which media to use in your f
 
 # todo
 
+- Make this entirely client side with the [Web Codecs API](https://wicg.github.io/web-codecs/)?
+    + Make a prototype first
 - Support deselecting a media item
 - 'Resolution' e.g. output videos every day, every other day, every week, month, year
     + Algorithm something like: 
