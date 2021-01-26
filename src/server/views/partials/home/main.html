@@ -2,6 +2,26 @@
 	<button class="consolidate-media">
 		Consolidate Media
 	</button>
+
+	<p>
+		Currently displaying {{dateBuckets.size}} days
+	</p>
+
+	<p>
+		{% if previousPage %}
+			<span>
+				<a href="{{previousPage}}">←</a>
+			</span>
+		{% endif %}
+
+		Page {{currentPageNumber}} of {{totalPages}}
+
+		{% if nextPage %}
+			<span>
+				<a href="{{nextPage}}">→</a>
+			</span>
+		{% endif %}
+	</p>
 </article>
 
 <ul class="media-grid">

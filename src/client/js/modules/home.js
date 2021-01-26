@@ -51,18 +51,12 @@ function replacePrimaryItem(target) {
 function handleConsolidateMedia() {
 	document.querySelector('.consolidate-media').addEventListener('click', async event => {
 		event.target.disabled = true;
-		const activeMediaItems = [...document.querySelectorAll('.media-grid__alternatives-list-item--active p')].map(activeMedia => {
-			return activeMedia.dataset.name;
-		});
 
-		const body = JSON.stringify(activeMediaItems);
+		const urlToPostTo = new URL(window.location);
+		urlToPostTo.searchParams.append('consolidate', true);
 
-		const response = await fetch('/consolidate-media', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body
+		const response = await fetch(urlToPostTo.toString(), {
+			method: 'POST'
 		});
 
 		if (response.ok) {

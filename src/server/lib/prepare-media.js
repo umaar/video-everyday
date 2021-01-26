@@ -49,7 +49,7 @@ async function init() {
 	const mediaFolder = config.get('media-folder');
 
 	const allMediaInDB = await mediaMetadataQueries.getAllMedia();
-	const allMediaNamesInDB = allMediaInDB.reduce((itemNames, currentItem) => {
+	const allMediaNamesInDB = allMediaInDB.reduce((itemNames, currentItem) => { // eslint-disable-line unicorn/no-array-reduce
 		itemNames.add(currentItem.relativeFilePath);
 		return itemNames;
 	}, new Set());

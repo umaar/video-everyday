@@ -29,7 +29,7 @@
     "subtitle": "^4.0.1"
   },
   "devDependencies": {
-    "@umaar/personal-eslint-config": "^1.0.4",
+    "@umaar/personal-eslint-config": "^1.0.5",
     "del": "^6.0.0",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
@@ -40,7 +40,7 @@
     "gulp-rev-rewrite": "^4.0.0",
     "gulp-sass": "^4.1.0",
     "gulp-sourcemaps": "^3.0.0",
-    "rollup": "^2.37.1",
+    "rollup": "^2.38.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^7.0.2",

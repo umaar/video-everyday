@@ -8,7 +8,7 @@ import config from 'config';
 import rimraf from 'rimraf';
 import moment from 'moment';
 
-import * as Subtitle from 'subtitle';
+import {stringifySync} from 'subtitle';
 
 import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
 import playlistsQueries from '../db/queries/playlists-queries.js';
@@ -93,7 +93,7 @@ router.post('/playlists/:slug', async (request, response) => {
 	response.redirect('/playlists');
 });
 
-router.post('/consolidate-media', async (request, response) => {
+async function handleConsolidate({response, playlistsSlug}) {
 	// Still need to apply sorting before copying media over
 	const videoSegmentFolder = config.get('video-segment-folder');
 	const consolidatedMediaFolder = config.get('consolidated-media-folder');
@@ -104,7 +104,12 @@ router.post('/consolidate-media', async (request, response) => {
 	}
 
 	console.time('Consolidate Media');
-	const selectedMediaItemsRaw = request.body;
+	const dateBucketsSelected = await getCompletePopulatedDateBuckets(playlistsSlug);
+
+	const selectedMediaItemsRaw = Array
+		.from(dateBucketsSelected)
+		.map(([, {selectedMediaItem}]) => selectedMediaItem.filename);
+
 	const allMedia = (await mediaMetadataQueries.getAllMedia());
 
 	const selectedMediaItems = selectedMediaItemsRaw.map(selectedMediaItem => {
@@ -188,19 +193,29 @@ router.post('/consolidate-media', async (request, response) => {
 		}
 
 		subtitleData.push({
-			start: ongoingDuration,
-			end: ongoingDuration + duration,
-			text: differenceString
+			data: {
+				start: ongoingDuration,
+				end: ongoingDuration + duration,
+				text: differenceString
+			},
+			type: 'cue'
 		});
 
 		ongoingDuration += duration;
 
 		console.log('Subtitles');
-		const subtitles = Subtitle.default.stringify([{
-			start: 0,
-			end: 10000,
-			text: differenceString
-		}]);
+
+		const listOfTextInSubtitle = [];
+		listOfTextInSubtitle.push({
+			data: {
+				start: 0,
+				end: 10000,
+				text: differenceString
+			},
+			type: 'cue'
+		});
+
+		const subtitles = stringifySync(listOfTextInSubtitle, {format: 'SRT'});
 
 		const fullPathToSubtitleFile = path.join(consolidatedMediaFolder, `${newFileName}.srt`);
 		writeFileSync(fullPathToSubtitleFile, subtitles);
@@ -218,7 +233,7 @@ router.post('/consolidate-media', async (request, response) => {
 		}
 	}
 
-	const subtitles = Subtitle.default.stringify(subtitleData);
+	const subtitles = stringifySync(subtitleData, {format: 'SRT'});
 	writeFileSync(path.join(consolidatedMediaFolder, 'subtitles.srt'), subtitles);
 
 	listOfFinalSegmentsForFFMPEG.map(fileName => console.log(`file '${fileName}'`));
@@ -228,23 +243,12 @@ router.post('/consolidate-media', async (request, response) => {
 	response.json({
 		ok: true
 	});
-});
+}
 
-router.get('/playlist/:slug', async (request, response) => {
-	const playlistSlug = request.params.slug;
+async function getCompletePopulatedDateBuckets(playlistSlug) {
+	const allMediaRaw = await mediaMetadataQueries.getAllMedia();
 
-	const currentPlaylist = await playlistsQueries.getPlaylistBySlug(playlistSlug);
-
-	if (!currentPlaylist) {
-		request.flash('messages', {
-			status: 'danger',
-			value: 'That playlist does not exist'
-		});
-
-		return response.redirect('/playlists');
-	}
-
-	const json = (await mediaMetadataQueries.getAllMedia()).sort((a, b) => {
+	const json = (allMediaRaw).sort((a, b) => {
 		const nameA = a.mediaTakenAt;
 		const nameB = b.mediaTakenAt;
 
@@ -283,7 +287,7 @@ router.get('/playlist/:slug', async (request, response) => {
 		};
 	});
 
-	const dateBuckets = json.reduce((previous, current) => {
+	const dateBuckets = json.reduce((previous, current) => { // eslint-disable-line unicorn/no-array-reduce
 		const currentDateBucket = current.formattedDate;
 		const existingBucketContents = previous.get(currentDateBucket) || [];
 
@@ -306,7 +310,7 @@ router.get('/playlist/:slug', async (request, response) => {
 
 	const exclusions = await exclusionsQueries.getExclusionsByPlaylistsSlug(playlistSlug);
 
-	const dateBucketsWithSelectedItems = [...dateBuckets].reduce((previous, current) => {
+	const dateBucketsSelected = [...dateBuckets].reduce((previous, current) => { // eslint-disable-line unicorn/no-array-reduce
 		const [dateTitle, items] = current;
 
 		const isCurrentDateExcluded = exclusions.has(dateTitle);
@@ -332,9 +336,48 @@ router.get('/playlist/:slug', async (request, response) => {
 		return previous;
 	}, new Map());
 
+	return dateBucketsSelected;
+}
+
+router.get('/playlist/:slug', async (request, response) => {
+	const playlistSlug = request.params.slug;
+
+	const currentPlaylist = await playlistsQueries.getPlaylistBySlug(playlistSlug);
+
+	if (!currentPlaylist) {
+		request.flash('messages', {
+			status: 'danger',
+			value: 'That playlist does not exist'
+		});
+
+		return response.redirect('/playlists');
+	}
+
+	function constructPageUrl(page = 1) {
+		return `/playlist/${playlistSlug}?page=${page}`;
+	}
+
+	const page = Number.parseInt(request.query.page, 10);
+
+	if (page < 1 || Number.isNaN(page)) {
+		const firstPage = constructPageUrl(1);
+		return response.redirect(firstPage);
+	}
+
+	const dateBucketsSelected = await getCompletePopulatedDateBuckets(playlistSlug);
+
+	const itemsPerPage = 4;
+	const offset = (page - 1) * itemsPerPage;
+	const paginatedDateBucketsSelected = new Map([...dateBucketsSelected].slice(offset, offset + itemsPerPage));
+	const totalPages = Math.ceil(dateBucketsSelected.size / itemsPerPage);
+
 	const renderObject = {
 		messages: request.flash('messages'),
-		dateBuckets: dateBucketsWithSelectedItems
+		dateBuckets: paginatedDateBucketsSelected,
+		currentPageNumber: page,
+		totalPages,
+		previousPage: page > 1 ? constructPageUrl(page - 1) : undefined,
+		nextPage: page < totalPages ? constructPageUrl(page + 1) : undefined
 	};
 
 	response.render('index', renderObject);
@@ -345,6 +388,16 @@ router.post('/playlist/:slug', async (request, response) => {
 
 	if (!playlistsSlug) {
 		throw new Error('No playlist slug provided!');
+	}
+
+	const shouldConsolidateMedia = request.query.consolidate;
+
+	if (shouldConsolidateMedia) {
+		return handleConsolidate({
+			request,
+			response,
+			playlistsSlug
+		});
 	}
 
 	const id = request.body.id;

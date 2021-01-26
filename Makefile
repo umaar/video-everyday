@@ -5,8 +5,8 @@ ENV ?= development
 
 install:
 	npm install
-	echo '' > node_modules/interpret/mjs-stub.js
-	echo 'Doing a weird hack to address https://github.com/knex/knex/issues/3882'
+# 	echo '' > node_modules/interpret/mjs-stub.js
+# 	echo 'Doing a weird hack to address https://github.com/knex/knex/issues/3882'
 
 update-deps:
 	ncu -u

@@ -1,6 +1,6 @@
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import forceDomain from 'forcedomain';
+import forceDomainModule from 'forcedomain';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import flash from 'connect-flash';
@@ -39,7 +39,7 @@ function init(app, express) {
 	// *** Middlewares *** //
 	app.use(compression());
 
-	app.use(forceDomain({
+	app.use(forceDomainModule.forceDomain({
 		hostname: config.get('hostname'),
 		protocol: 'https'
 	}));

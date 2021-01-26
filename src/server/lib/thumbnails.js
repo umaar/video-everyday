@@ -76,7 +76,7 @@ async function init() {
 	const videoThumbnailsWhichNeedGenerating = videoFilesInDB.filter(({
 		thumbnailFolderForMedia
 	}) => {
-		const hasEveryThumbnail = Array.from({length: thumbnailsDesiredAmount}, (v, i) => i + 1).every(currentIndex => {
+		const hasEveryThumbnail = Array.from({length: thumbnailsDesiredAmount}, (v, index) => index + 1).every(currentIndex => {
 			return existingThumbnails.includes(path.join(
 				thumbnailFolderForMedia,
 				`${currentIndex}.jpg`
