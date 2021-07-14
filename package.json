@@ -8,16 +8,16 @@
     "compression": "^1.7.4",
     "config": "^3.3.3",
     "connect-flash": "^0.1.1",
-    "connect-session-knex": "^2.0.0",
+    "connect-session-knex": "^2.1.0",
     "cookie-parser": "~1.4.5",
     "debug": "^4.3.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "exif-reader": "^1.0.3",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "fluent-ffmpeg": "^2.1.2",
     "forcedomain": "^2.2.2",
-    "knex": "^0.21.16",
+    "knex": "^0.95.7",
     "moment": "^2.29.1",
     "nunjucks": "^3.2.2",
     "passport": "^0.4.1",
@@ -26,7 +26,7 @@
     "signale": "^1.4.0",
     "slugify": "^1.4.6",
     "sqlite3": "^5.0.1",
-    "subtitle": "^4.0.1"
+    "subtitle": "^4.1.0"
   },
   "devDependencies": {
     "@umaar/personal-eslint-config": "^1.0.5",
@@ -38,15 +38,16 @@
     "gulp-rev": "^9.0.0",
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-rev-rewrite": "^4.0.0",
-    "gulp-sass": "^4.1.0",
+    "gulp-sass": "^5.0.0",
     "gulp-sourcemaps": "^3.0.0",
     "rollup": "^2.38.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.35.2",
     "tiny-lr": "^2.0.0",
     "vinyl-paths": "^3.0.1",
-    "xo": "^0.37.1"
+    "xo": "^0.41.0"
   },
   "xo": {
     "extends": "./node_modules/@umaar/personal-eslint-config/rules.json"

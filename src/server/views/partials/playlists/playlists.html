@@ -1,32 +1,50 @@
 <article>
 	<h2>Your Playlists ({{playlists.length}})</h2>
 
-	<form action="/playlists" method="post">
-		{% include './playlist-form.html' %}
-	</form>
-
 	<ul class="playlists-list">
 		{% for playlist in playlists %}
 			<li>
-				<a href="/playlist/{{playlist.slug}}">{{playlist.name}}</a>
+				<h2>
+					<a href="/playlist/{{playlist.slug}}">{{playlist.name}}</a>
+				</h2>
 
 				<details open>
 					<summary>Extra</summary>
 
-					<p>
-						Created: {{playlist.created_at}}
-					</p>
+					<ul>
+						<li>
+							Trimmed Media Range: <code>
+								
+							</code>
+						</li>
 
-					<p>
-						Updated: {{playlist.updated_at}}
-					</p>
+						<li>
+							Media Availibility Range: <code>
+								
+							</code>
+						</li>
+
+						<li>
+							Playlist Created: <code>{{playlist.created_at}}</code>
+						</li>
+
+						<li>
+							Playlist Updated: <code>{{playlist.updated_at}}</code>
+						</li>
+					</ul>
 
 					<form action="/playlists/{{playlist.slug}}" method="post">
 						{% set playlistName = playlist.name %}
+						{% set playlistStartDate = playlist.startDate %}
+						{% set playlistEndDate = playlist.endDate %}
 						{% include './playlist-form.html' %}
 					</form>
 				</details>
 			</li>
 		{% endfor %}
 	</ul>
+
+	<form action="/playlists" method="post">
+		{% include './playlist-form.html' %}
+	</form>
 </article>

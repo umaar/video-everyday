@@ -2,6 +2,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import forceDomainModule from 'forcedomain';
 import bodyParser from 'body-parser';
+import moment from 'moment';
 import session from 'express-session';
 import flash from 'connect-flash';
 import nunjucks from 'nunjucks';
@@ -23,10 +24,14 @@ function init(app, express) {
 		path.join(process.cwd(), 'src', 'server', 'views')
 	];
 
-	nunjucks.configure(viewFolders, {
+	const nunjucksEnvironment = nunjucks.configure(viewFolders, {
 		express: app,
 		autoescape: true,
 		noCache: true
+	});
+
+	nunjucksEnvironment.addFilter('formatForHTMLDateInput', string => {
+		return moment(string).format('YYYY-MM-DD');
 	});
 
 	app.locals.config = {

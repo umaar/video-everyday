@@ -14,11 +14,13 @@ async function insert(playlistName) {
 	});
 }
 
-async function update({newPlaylistName, oldSlug}) {
+async function update({newPlaylistName, oldSlug, newStartDate, newEndDate}) {
 	return knex(playlistsTableName)
 		.update({
 			name: newPlaylistName,
 			slug: slugify(newPlaylistName),
+			startDate: newStartDate,
+			endDate: newEndDate,
 			updated_at: new Date().toISOString() // eslint-disable-line camelcase
 		})
 		.where('slug', oldSlug);

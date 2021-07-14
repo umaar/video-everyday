@@ -65,32 +65,50 @@ router.post('/playlists', async (request, response) => {
 
 router.post('/playlists/:slug', async (request, response) => {
 	const newPlaylistName = request.body['playlist-name'];
+	const startDate = moment(request.body['start-date']);
+	const endDate = moment(request.body['end-date']);
 	const oldSlug = request.params.slug;
 
 	if (!newPlaylistName) {
 		throw new Error('No playlist name provided!');
 	}
 
+	if (startDate.isValid() && endDate.isValid()) {
+		if (endDate.isSameOrBefore(startDate)) {
+			request.flash('messages', {
+				status: 'danger',
+				value: 'The end date cannot be the same or before the start date!'
+			});
+
+			return response.redirect('/playlists');
+		}
+	}
+
+	const newStartDate = startDate.isValid() ? startDate.toDate() : '';
+	const newEndDate = endDate.isValid() ? endDate.toDate() : '';
+
 	try {
 		await playlistsQueries.update({
 			newPlaylistName,
+			newStartDate,
+			newEndDate,
 			oldSlug
 		});
 
 		request.flash('messages', {
 			status: 'success',
-			value: 'Updating that playlist name was successful'
+			value: 'Playlist updated'
 		});
 	} catch (error) {
 		console.log(error);
 
 		request.flash('messages', {
 			status: 'danger',
-			value: 'Could not update the playlist title'
+			value: 'Could not update the playlist'
 		});
 	}
 
-	response.redirect('/playlists');
+	return response.redirect('/playlists');
 });
 
 async function handleConsolidate({response, playlistsSlug}) {

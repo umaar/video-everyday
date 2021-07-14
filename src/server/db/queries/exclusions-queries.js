@@ -32,7 +32,6 @@ async function getExclusionsByPlaylistsSlug(slug) {
 		.from(exclusionsTableName);
 	const usefulProperties = results.map(({formattedDate}) => formattedDate);
 	return new Set(usefulProperties);
-	// Return results.map(({formattedDate}) => formattedDate);
 }
 
 const exports = {

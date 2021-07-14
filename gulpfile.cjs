@@ -2,7 +2,7 @@ const { readFileSync } = require('fs');
 
 const nodemon = require('nodemon');
 const gulp = require('gulp');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const del = require('del');
 const tinyLR = require('tiny-lr');
 const server = tinyLR();
