@@ -27,10 +27,10 @@ async function init({mediaFile, totalVideoDuration}) {
 	// const ffmpegBinary = '/usr/local/bin/ffmpeg';
 	const halfWayMark = Math.floor(totalVideoDuration / 2);
 	// Const command = `(cd '${videoSegmentFolderForMedia}' && ${ffmpeg} -splitx ${halfWayMark}:${halfWayMark + defaultVideoSegmentDuration} '${absoluteFilePathForMedia}')`;
-	const command = `ffmpeg  -hide_banner  -i '${absoluteFilePathForMedia}' -ss ${halfWayMark} -strict -2 -to ${halfWayMark + defaultVideoSegmentDuration} '${path.join(videoSegmentFolderForMedia, newFileName)}'`;
+	const command = `ffmpeg -y -hide_banner -i '${absoluteFilePathForMedia}' -ss ${halfWayMark} -strict -2 -to ${halfWayMark + defaultVideoSegmentDuration} '${path.join(videoSegmentFolderForMedia, newFileName)}'`;
 
 	const hrtime = process.hrtime()[1];
-	console.log(command);
+	console.log(`${command}`);
 
 	console.time(`ffmpeg Video Segment Creation ${hrtime}`);
 	try {

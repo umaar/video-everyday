@@ -71,15 +71,19 @@ async function init() {
 		await mediaMetadataQueries.deleteFileEntry(orphanMediaDBItem);
 	}));
 
-	// Items already in the database don't need processing again
-	const mediaFilesWhichNeedProcessing = candidateMediaFiles.filter(item => {
-		return !allMediaNamesInDB.has(item);
-	});
-
 	let unprocessableMediaCount = 0;
 
+	// Items already in the database don't need processing again
+	const mediaFilesWhichNeedProcessing = candidateMediaFiles.filter(mediaFile => {
+		return !allMediaNamesInDB.has(mediaFile);
+	}).filter(mediaFile => {
+		return getMediaType(mediaFile) === 'video';
+	});
+
+	let currentIteration = 0;
+
 	for (const mediaFile of mediaFilesWhichNeedProcessing) {
-		const isVideo = getMediaType(mediaFile) === 'video';
+		currentIteration++;
 		let metadata;
 
 		try {
@@ -94,6 +98,12 @@ async function init() {
 			continue;
 		}
 
+		if (Math.floor(metadata.duration) <= 1) {
+			unprocessableMediaCount++;
+			console.log(`${mediaFile} is too short. Skipping this item.`);
+			continue;
+		}
+
 		const DBRecord = {
 			relativeFilePath: mediaFile,
 			mediaTakenAt: metadata.timestamp,
@@ -101,23 +111,24 @@ async function init() {
 			videoDuration: metadata.duration
 		};
 
-		if (isVideo) {
-			DBRecord.videoDuration = metadata.duration;
+		DBRecord.videoDuration = metadata.duration;
+		const consoleGroupTitle = `Video Segment Creation (${currentIteration}/${mediaFilesWhichNeedProcessing.length})`;
+		console.group(consoleGroupTitle);
+		const {
+			desiredSegmentDuration,
+			relativeVideoSegmentPath,
+			actualVideoSegmentDuration
+		} = await generateVideoSegment({ // eslint-disable-line no-await-in-loop
+			mediaFile,
+			totalVideoDuration: DBRecord.videoDuration
+		});
 
-			const {
-				desiredSegmentDuration,
-				relativeVideoSegmentPath,
-				actualVideoSegmentDuration
-			} = await generateVideoSegment({ // eslint-disable-line no-await-in-loop
-				mediaFile,
-				totalVideoDuration: DBRecord.videoDuration
-			});
+		console.log(`Created: ${relativeVideoSegmentPath}`);
+		console.groupEnd(consoleGroupTitle)
 
-			console.log(`New Video Segment: ${relativeVideoSegmentPath}`);
-			DBRecord.defaultVideoSegment = relativeVideoSegmentPath;
-			DBRecord.defaultDesiredVideoSegmentDuration = desiredSegmentDuration;
-			DBRecord.actualVideoSegmentDuration = actualVideoSegmentDuration;
-		}
+		DBRecord.defaultVideoSegment = relativeVideoSegmentPath;
+		DBRecord.defaultDesiredVideoSegmentDuration = desiredSegmentDuration;
+		DBRecord.actualVideoSegmentDuration = actualVideoSegmentDuration;
 
 		await mediaMetadataQueries.insert(DBRecord); // eslint-disable-line no-await-in-loop
 	}

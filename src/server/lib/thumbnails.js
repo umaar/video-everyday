@@ -97,7 +97,13 @@ async function init() {
 		console.log('No video thumbails need generating');
 	}
 
+	let currentIteration = 0;
+
 	for (const item of videoThumbnailsWhichNeedGenerating) {
+		currentIteration++;
+		const consoleGroupTitle = `Thumbnail Creation (${currentIteration}/${videoThumbnailsWhichNeedGenerating.length})`;
+		console.group(consoleGroupTitle);
+
 		const {absoluteFilePathForMedia, thumbnailFolderForMedia} = item;
 
 		if (fs.existsSync(thumbnailFolderForMedia)) {
@@ -118,6 +124,8 @@ async function init() {
 			absoluteFilePathForMedia,
 			thumbnailFolderForMedia
 		});
+
+		console.groupEnd(consoleGroupTitle)
 	}
 }
 

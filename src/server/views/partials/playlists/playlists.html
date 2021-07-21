@@ -8,7 +8,7 @@
 					<a href="/playlist/{{playlist.slug}}">{{playlist.name}}</a>
 				</h2>
 
-				<details open>
+				<details closed>
 					<summary>Extra</summary>
 
 					<ul>
@@ -32,14 +32,14 @@
 							Playlist Updated: <code>{{playlist.updated_at}}</code>
 						</li>
 					</ul>
-
-					<form action="/playlists/{{playlist.slug}}" method="post">
-						{% set playlistName = playlist.name %}
-						{% set playlistStartDate = playlist.startDate %}
-						{% set playlistEndDate = playlist.endDate %}
-						{% include './playlist-form.html' %}
-					</form>
 				</details>
+
+				<form action="/playlists/{{playlist.slug}}" method="post">
+					{% set playlistName = playlist.name %}
+					{% set playlistStartDate = playlist.startDate %}
+					{% set playlistEndDate = playlist.endDate %}
+					{% include './playlist-form.html' %}
+				</form>
 			</li>
 		{% endfor %}
 	</ul>

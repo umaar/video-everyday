@@ -84,8 +84,8 @@ router.post('/playlists/:slug', async (request, response) => {
 		}
 	}
 
-	const newStartDate = startDate.isValid() ? startDate.toDate() : '';
-	const newEndDate = endDate.isValid() ? endDate.toDate() : '';
+	const newStartDate = startDate.isValid() ? startDate.startOf('day').toDate() : undefined;
+	const newEndDate = endDate.isValid() ? endDate.endOf('day').toDate() : undefined;
 
 	try {
 		await playlistsQueries.update({
@@ -265,6 +265,9 @@ async function handleConsolidate({response, playlistsSlug}) {
 
 async function getCompletePopulatedDateBuckets(playlistSlug) {
 	const allMediaRaw = await mediaMetadataQueries.getAllMedia();
+	const playlist = await playlistsQueries.getPlaylistBySlug(playlistSlug);
+	const playlistStartDate = playlist.startDate || -Infinity;
+	const playlistEndDate = playlist.endDate || Infinity;
 
 	const json = (allMediaRaw).sort((a, b) => {
 		const nameA = a.mediaTakenAt;
@@ -279,6 +282,8 @@ async function getCompletePopulatedDateBuckets(playlistSlug) {
 		}
 
 		return 0;
+	}).filter(({mediaTakenAt}) => {
+		return (mediaTakenAt >= playlistStartDate) && (mediaTakenAt <= playlistEndDate);
 	}).map(item => {
 		const isVideo = getMediaType(item.relativeFilePath) === 'video';
 		const createdDate = new Date(item.mediaTakenAt);
