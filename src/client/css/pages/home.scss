@@ -75,3 +75,12 @@ $grid-item-width: 200px;
 		padding: 5px;
 	}
 }
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+
+	a {
+		padding: 10px;
+	}
+}

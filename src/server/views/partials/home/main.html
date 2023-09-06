@@ -1,12 +1,4 @@
-<article>
-	<button class="consolidate-media">
-		Consolidate Media
-	</button>
-
-	<p>
-		Currently displaying {{dateBuckets.size}} days
-	</p>
-
+<article class="pagination">
 	<p>
 		{% if previousPage %}
 			<span>
@@ -21,6 +13,10 @@
 				<a href="{{nextPage}}">→</a>
 			</span>
 		{% endif %}
+	</p>
+
+	<p>
+		Currently displaying {{dateBuckets.size}} days
 	</p>
 </article>
 

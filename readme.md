@@ -86,6 +86,9 @@ The web interface allows you to (optionally) select which media to use in your f
 6. Remove the current media source item from `allTopLevelSegmentFolders`
 7. At the end of looping through all top level media source items, as a cleanup task, delete any remaining items in `allTopLevelSegmentFolders`
 
+### Useful ffmpeg commands
+
+https://gist.github.com/protrolium/e0dbd4bb0f1a396fcb55
 
 ### scripts WIP
 
@@ -132,5 +135,4 @@ file 'scaled/0003.mkv'
 
 ```sh
 ffmpeg -i scaled/out.mkv  -filter:v subtitles=subtitles.srt scaled/out-subtitles.mkv
-
 ```

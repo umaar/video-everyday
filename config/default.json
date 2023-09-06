@@ -12,5 +12,6 @@
 	"web-server-media-path": "/media",
 	"thumbnails-amount": 20,
 	"video-segment-duration-seconds": 1,
-	"birth-date": "01 January 2000"
+	"birth-date": "01 January 2000",
+	"skip-media-scanning": true
 }

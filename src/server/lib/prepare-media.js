@@ -45,6 +45,13 @@ function handleFolderChecks() {
 }
 
 async function init() {
+	const shouldSkipMediaScanning = config.get('skip-media-scanning');
+
+	if (shouldSkipMediaScanning) {
+		console.warn('\nMedia scanning is being skipped. Use the `skip-media-scanning` config option to change this behaviour\n');
+		return;
+	}
+
 	handleFolderChecks();
 	const mediaFolder = config.get('media-folder');
 

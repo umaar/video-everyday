@@ -1,25 +1,25 @@
+import fs from "fs";
+import path from "path";
+import config from "config";
+import ffmpeg from "fluent-ffmpeg";
+import { rimrafSync } from "rimraf";
 
-import fs from 'fs';
-import path from 'path';
-import config from 'config';
-import ffmpeg from 'fluent-ffmpeg';
-import rimraf from 'rimraf';
+import mediaMetadataQueries from "../db/queries/media-metadata-queries.js";
+import scanFiles from "./scan-files.js";
+import { getMediaType } from "./is-valid-media-type.js";
 
-import mediaMetadataQueries from '../db/queries/media-metadata-queries.js';
-import scanFiles from './scan-files.js';
-import {getMediaType} from './is-valid-media-type.js';
-
-const thumbnailsDesiredAmount = config.get('thumbnails-amount');
+const thumbnailsDesiredAmount = config.get("thumbnails-amount");
 const startPositionPercent = 5;
 const endPositionPercent = 95;
-const addPercent = (endPositionPercent - startPositionPercent) / (thumbnailsDesiredAmount - 1);
+const addPercent =
+	(endPositionPercent - startPositionPercent) / (thumbnailsDesiredAmount - 1);
 
-const mediaFolder = config.get('media-folder');
-const thumbnailsFolder = config.get('thumbnails-folder');
+const mediaFolder = config.get("media-folder");
+const thumbnailsFolder = config.get("thumbnails-folder");
 
 function generateThumbnails({
 	absoluteFilePathForMedia,
-	thumbnailFolderForMedia
+	thumbnailFolderForMedia,
 }) {
 	return new Promise(resolve => {
 		let currentScreenshotIndex = 0;
@@ -27,33 +27,38 @@ function generateThumbnails({
 		const timestamps = [];
 		let index = 0;
 		while (index < thumbnailsDesiredAmount) {
-			timestamps.push(`${startPositionPercent + (addPercent * index)}%`);
+			timestamps.push(`${startPositionPercent + addPercent * index}%`);
 			index += 1;
 		}
 
 		function takeScreenshots(file) {
 			ffmpeg(absoluteFilePathForMedia)
-				.on('start', () => {
+				.on("start", () => {
 					if (currentScreenshotIndex < 1) {
 						console.log(`About to take screenshots for ${file}`);
 					}
 				})
-				.on('end', () => {
+				.on("end", () => {
 					currentScreenshotIndex += 1;
 
 					if (currentScreenshotIndex < thumbnailsDesiredAmount) {
 						takeScreenshots(file);
 					} else {
-						console.log(`Screenshot ${file}: ${currentScreenshotIndex}/${thumbnailsDesiredAmount} taken`);
+						console.log(
+							`Screenshot ${file}: ${currentScreenshotIndex}/${thumbnailsDesiredAmount} taken`
+						);
 						resolve();
 					}
 				})
-				.screenshots({
-					count: 1,
-					timemarks: [timestamps[currentScreenshotIndex]],
-					filename: `${currentScreenshotIndex + 1}.jpg`,
-					size: '300x?'
-				}, thumbnailFolderForMedia);
+				.screenshots(
+					{
+						count: 1,
+						timemarks: [timestamps[currentScreenshotIndex]],
+						filename: `${currentScreenshotIndex + 1}.jpg`,
+						size: "300x?",
+					},
+					thumbnailFolderForMedia
+				);
 		}
 
 		takeScreenshots(absoluteFilePathForMedia);
@@ -64,37 +69,51 @@ async function init() {
 	const existingThumbnails = await scanFiles(thumbnailsFolder);
 	const rawMediaInDB = await mediaMetadataQueries.getAllMedia();
 
-	const videoFilesInDB = rawMediaInDB.filter(({relativeFilePath}) => {
-		return getMediaType(relativeFilePath) === 'video';
-	}).map(({relativeFilePath}) => {
-		return {
-			absoluteFilePathForMedia: path.join(mediaFolder, relativeFilePath),
-			thumbnailFolderForMedia: path.join(thumbnailsFolder, relativeFilePath)
-		};
-	});
-
-	const videoThumbnailsWhichNeedGenerating = videoFilesInDB.filter(({
-		thumbnailFolderForMedia
-	}) => {
-		const hasEveryThumbnail = Array.from({length: thumbnailsDesiredAmount}, (v, index) => index + 1).every(currentIndex => {
-			return existingThumbnails.includes(path.join(
-				thumbnailFolderForMedia,
-				`${currentIndex}.jpg`
-			));
+	const videoFilesInDB = rawMediaInDB
+		.filter(({ relativeFilePath }) => {
+			return getMediaType(relativeFilePath) === "video";
+		})
+		.map(({ relativeFilePath }) => {
+			return {
+				absoluteFilePathForMedia: path.join(
+					mediaFolder,
+					relativeFilePath
+				),
+				thumbnailFolderForMedia: path.join(
+					thumbnailsFolder,
+					relativeFilePath
+				),
+			};
 		});
 
-		const hasTooManyThumbnails = existingThumbnails.includes(path.join(
-			thumbnailFolderForMedia,
-			`${thumbnailsDesiredAmount + 1}.jpg`
-		));
+	const videoThumbnailsWhichNeedGenerating = videoFilesInDB.filter(
+		({ thumbnailFolderForMedia }) => {
+			const hasEveryThumbnail = Array.from(
+				{ length: thumbnailsDesiredAmount },
+				(v, index) => index + 1
+			).every(currentIndex => {
+				return existingThumbnails.includes(
+					path.join(thumbnailFolderForMedia, `${currentIndex}.jpg`)
+				);
+			});
 
-		return !hasEveryThumbnail || hasTooManyThumbnails;
-	});
+			const hasTooManyThumbnails = existingThumbnails.includes(
+				path.join(
+					thumbnailFolderForMedia,
+					`${thumbnailsDesiredAmount + 1}.jpg`
+				)
+			);
+
+			return !hasEveryThumbnail || hasTooManyThumbnails;
+		}
+	);
 
 	if (videoThumbnailsWhichNeedGenerating.length > 0) {
-		console.log(`${videoThumbnailsWhichNeedGenerating.length} videos needs thumbnail processing`);
+		console.log(
+			`${videoThumbnailsWhichNeedGenerating.length} videos needs thumbnail processing`
+		);
 	} else {
-		console.log('No video thumbails need generating');
+		console.log("No video thumbails need generating");
 	}
 
 	let currentIteration = 0;
@@ -104,28 +123,31 @@ async function init() {
 		const consoleGroupTitle = `Thumbnail Creation (${currentIteration}/${videoThumbnailsWhichNeedGenerating.length})`;
 		console.group(consoleGroupTitle);
 
-		const {absoluteFilePathForMedia, thumbnailFolderForMedia} = item;
+		const { absoluteFilePathForMedia, thumbnailFolderForMedia } = item;
 
 		if (fs.existsSync(thumbnailFolderForMedia)) {
 			if (thumbnailFolderForMedia.length < 20) {
 				// Naive check for now
-				throw new Error('Will not delete: ', thumbnailFolderForMedia);
+				throw new Error("Will not delete: ", thumbnailFolderForMedia);
 			}
 
-			console.log(`Deleting ${thumbnailFolderForMedia} as it needs processing again`);
-			rimraf.sync(thumbnailFolderForMedia);
+			console.log(
+				`Deleting ${thumbnailFolderForMedia} as it needs processing again`
+			);
+			rimrafSync.sync(thumbnailFolderForMedia);
 		}
 
 		fs.mkdirSync(thumbnailFolderForMedia, {
-			recursive: true
+			recursive: true,
 		});
 
-		await generateThumbnails({ // eslint-disable-line no-await-in-loop
+		await generateThumbnails({
+			// eslint-disable-line no-await-in-loop
 			absoluteFilePathForMedia,
-			thumbnailFolderForMedia
+			thumbnailFolderForMedia,
 		});
 
-		console.groupEnd(consoleGroupTitle)
+		console.groupEnd(consoleGroupTitle);
 	}
 }
 
