@@ -161,7 +161,7 @@ async function handleConsolidate({ response, playlistsSlug }) {
 		throw new Error("Handle this. No selected media items found");
 	}
 
-	rimrafSync.sync(`${consolidatedMediaFolder}/*`);
+	rimrafSync(`${consolidatedMediaFolder}/*`);
 
 	const subtitleData = [];
 	let ongoingDuration = 0;
@@ -444,7 +444,7 @@ router.get("/playlist/:slug", async (request, response) => {
 	const dateBucketsSelected =
 		await getCompletePopulatedDateBuckets(playlistSlug);
 
-	const itemsPerPage = 4;
+	const itemsPerPage = 8;
 	const offset = (page - 1) * itemsPerPage;
 	const paginatedDateBucketsSelected = new Map(
 		[...dateBucketsSelected].slice(offset, offset + itemsPerPage)

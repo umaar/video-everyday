@@ -134,7 +134,7 @@ async function init() {
 			console.log(
 				`Deleting ${thumbnailFolderForMedia} as it needs processing again`
 			);
-			rimrafSync.sync(thumbnailFolderForMedia);
+			rimrafSync(thumbnailFolderForMedia);
 		}
 
 		fs.mkdirSync(thumbnailFolderForMedia, {
